@@ -26,17 +26,17 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 Estos ejercicios están diseñados para que te familiarices con los comandos de Docker de forma gradual y práctica.
 
-1.  **Gestión de Imágenes y Contenedores**
+### **Ejercicio 1: Gestión de Imágenes y Contenedores**
 
-    **a. Verificación de la Instalación y Listado de Imágenes:**
+a.  **Verificación de la Instalación y Listado de Imágenes:**
 
     ```bash
     docker --version
     ```
 
-    > Verifica que Docker esté instalado.
+> Verifica que Docker esté instalado.
 
-    **b. Descarga de Imágenes (docker pull):**
+b.  **Descarga de Imágenes (docker pull):**
 
     - El comando `docker pull` descarga una imagen desde un registro (por defecto, Docker Hub).
 
