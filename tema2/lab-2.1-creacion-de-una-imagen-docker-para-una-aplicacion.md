@@ -28,15 +28,15 @@ Estos ejercicios están diseñados para que te familiarices con los comandos de 
 
 ### **Ejercicio 1: Gestión de Imágenes y Contenedores**
 
-a.  **Verificación de la Instalación y Listado de Imágenes:**
+1.  **Verificación de la Instalación y Listado de Imágenes:**
 
     ```bash
     docker --version
     ```
 
-> Verifica que Docker esté instalado.
+    > Verifica que Docker esté instalado.
 
-b.  **Descarga de Imágenes (docker pull):**
+2.  **Descarga de Imágenes (docker pull):**
 
     - El comando `docker pull` descarga una imagen desde un registro (por defecto, Docker Hub).
 
@@ -62,7 +62,7 @@ b.  **Descarga de Imágenes (docker pull):**
         docker images
         ```
     
-    **c. Búsqueda de Imágenes (docker search):**
+3.  **Búsqueda de Imágenes (docker search):**
     - Te permite buscar imágenes en Docker Hub directamente desde la terminal.
 
     - **Sintaxis:** `docker search <término-de-búsqueda>`
@@ -72,7 +72,7 @@ b.  **Descarga de Imágenes (docker pull):**
         docker search wordpress
         ```
     
-    **d. Ejecución de Contenedores (docker run):**
+4. **Ejecución de Contenedores (docker run):**
 
     - Este comando es el más utilizado. Combina la creación y ejecución de un contenedor en un solo paso.
 
@@ -100,7 +100,7 @@ b.  **Descarga de Imágenes (docker pull):**
         - `-p 8080:80`: Mapea el puerto 8080 del host al puerto 80 del contenedor.
         - `--name mi-servidor`: Asigna un nombre al contenedor para facilitar su gestión.
 
-    **e. Gestión de Contenedores en ejecución (docker ps, docker stop, docker rm):**
+5.  **Gestión de Contenedores en ejecución (docker ps, docker stop, docker rm):**
     - `docker ps`: Muestra los contenedores que se están ejecutando actualmente.
 
     - `docker ps -a`: Muestra todos los contenedores, incluidos los detenidos.
@@ -113,7 +113,7 @@ b.  **Descarga de Imágenes (docker pull):**
 
     - `docker container prune`: Elimina los contenedores detenidos.
 
-    **f. Visualización de Logs (docker logs):**
+6.  **Visualización de Logs (docker logs):**
     - Te permite ver la salida de un contenedor. Es esencial para la depuración.
 
     - `docker logs <ID o Nombre>`: Muestra los logs desde el inicio del contenedor.
