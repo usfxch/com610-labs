@@ -132,6 +132,7 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
         FROM alpine
         CMD ["echo", "¡Hola desde mi primera imagen Docker!"]
         ```
+        > **Explicación:** Usa una imagen base muy ligera (alpine) y ejecuta un comando simple al iniciar el contenedor.
 
     - **Cómo ejecutarlo 🚀:**
         - **Construye la imagen:**
@@ -148,6 +149,194 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
             ```
             > El contenedor imprimirá el mensaje y luego se detendrá y eliminará (`--rm`).
 
+2. **Ejemplo para una Aplicación Web Simple**
 
+    - **Crea los siguientes archivos en una carpeta:**
 
-    
+        - `app.js`: Un servidor web básico que responde en el puerto 3000.
+            ```Javascript
+            const http = require('http');
+
+            const hostname = '0.0.0.0';
+            const port = 3000;
+
+            const server = http.createServer((req, res) => {
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'text/plain');
+              res.end('¡Hola desde mi primera aplicacion Dockerizada!\n');
+            });
+
+            server.listen(port, hostname, () => {
+              console.log(`Servidor en ejecucion en http://${hostname}:${port}/`);
+            });
+            ```
+
+        - `package.json`: Este archivo define la información del proyecto y sus dependencias. La parte más importante es el scripts para iniciar la aplicación.
+
+            ```JSON
+            {
+              "name": "mi-app-docker",
+              "version": "1.0.0",
+              "description": "Una aplicación web simple para demostrar Docker.",
+              "main": "app.js",
+              "scripts": {
+                "start": "node app.js"
+              },
+              "author": "Tu Nombre",
+              "license": "ISC",
+              "dependencies": {}
+            }
+            ```
+
+        - `Dockerfile`:
+            ```Dockerfile
+            FROM node:20-alpine
+            WORKDIR /app
+            COPY . .
+            CMD ["node", "app.js"]
+            ```
+            > **Explicación:** Copia los archivos de la aplicación a una imagen base de Node.js y ejecuta el script principal.
+
+    - **Cómo ejecutarlo 🚀:**
+
+        - **Construye la imagen:**
+            ```bash
+            docker build -t mi-app-web:1.0 .
+            ```
+
+        - **Ejecuta el contenedor:**
+            ```bash
+            docker run -d -p 8080:3000 --name mi-web-app mi-app-web:1.0
+            ```
+
+            > `-p 8080:3000`: Mapea el puerto de la aplicación (3000) a un puerto local (8080).
+
+        - **Verifica:** Abre tu navegador y visita [http://localhost:8080](http://localhost:8080).
+
+3.  **Ejemplo con Gestión de Dependencias (Más Complejo)**
+
+    - `Dockerfile`:
+        ```Dockerfile
+        FROM node:20-alpine
+        WORKDIR /app
+        COPY package.json .
+        RUN npm install
+        COPY . .
+        EXPOSE 3000
+        CMD ["npm", "start"]
+        ```
+        > **Explicación:** Este método optimiza el proceso de construcción. Al copiar e instalar las dependencias en un paso separado, Docker puede reutilizar esa capa si el archivo `package.json` no cambia.
+
+    - **Cómo ejecutarlo 🚀:**
+
+        - **Construye la imagen:**
+            ```bash
+            docker build -t mi-app-con-dependencias:1.0 .
+            ```
+
+        - **Ejecuta el contenedor:**
+            ```bash
+            docker run -d -p 8080:3000 mi-app-con-dependencias:1.0
+            ```
+
+4. **Ejemplo con Múltiples Fases (`Multi-stage Build`)**
+
+    Un método avanzado que crea una imagen final mucho más ligera.
+
+    - `Dockerfile`:
+        ```Dockerfile
+        # Fase de construcción
+        FROM node:20-alpine as builder
+        WORKDIR /app
+        COPY package.json .
+        RUN npm install
+        COPY . .
+
+        # Fase final (imagen final más ligera)
+        FROM node:20-alpine
+        WORKDIR /app
+        COPY --from=builder /app .
+        CMD ["node", "app.js"]
+        ```
+        > **Explicación:** Este método avanzado crea una imagen final mucho más ligera al copiar solo los archivos esenciales desde una imagen temporal de "construcción".
+
+    - **Cómo ejecutarlo 🚀:**
+
+        - **Construye la imagen final optimizada:**
+            ```bash
+            docker build -t mi-app-optimizada:1.0 .
+            ```
+
+        - **Ejecuta el contenedor:**
+            ```bash
+            docker run -d -p 8080:3000 mi-app-optimizada:1.0
+            ```
+
+5. **Ejemplo para una Aplicación de Python**
+
+    - `app.py`: Este archivo utiliza el framework web Flask para crear una API simple que responde a una solicitud GET.
+        ```Python
+        from flask import Flask
+
+        app = Flask(__name__)
+
+        @app.route('/')
+        def home():
+          return '¡Hola desde mi aplicación Dockerizada en Python!'
+
+        if __name__ == '__main__':
+          app.run(host='0.0.0.0', port=5000)
+        ```
+
+    - `requirements.txt`: Este archivo lista las dependencias del proyecto de Python. Flask es la única dependencia necesaria para este ejemplo.
+
+        ```Plaintext
+        Flask
+        ```
+
+    - `Dockerfile`:
+        ```Dockerfile
+        FROM python:3.9-alpine
+        WORKDIR /app
+        COPY requirements.txt .
+        RUN pip install -r requirements.txt
+        COPY . .
+        CMD ["python", "app.py"]
+        ```
+        > **Explicación:** Usa una imagen base de Python, instala las dependencias de `requirements.txt` y ejecuta el script principal `app.py`.
+
+    - **Cómo ejecutarlo 🚀:**
+
+        - **Construye la imagen:**
+            ```bash
+            docker build -t mi-app-python:1.0 .
+            ```
+
+        - **Ejecuta el contenedor:**
+            ```bash
+            docker run -d -p 8080:8000 mi-app-python:1.0
+            ```
+        
+### Práctica Individual (Tarea de Mayor Complejidad) 💻
+
+Tu objetivo es crear una imagen de Docker para una aplicación de API simple (utilizando [ExpressJS](https://expressjs.com/), [Flask](https://flask.palletsprojects.com/en/stable/) u otro) que devuelva un mensaje. Esta tarea consolidará tus conocimientos sobre la estructura de un proyecto y la gestión de dependencias.
+
+1. **Configuración del Proyecto:**
+
+    - Crea una carpeta y los archivos de código necesarios para una API básica.
+
+2. **Construcción de la Imagen:**
+
+    - Escribe un `Dockerfile` que use una imagen base adecuada, instale las dependencias y construya la imagen.
+
+3. **Ejecución y Verificación:**
+
+    - Inicia el contenedor de tu API. Asegúrate de mapear el puerto de la API al puerto 8080 de tu máquina local.
+
+    - Utiliza tu navegador o una herramienta como **Postman** o **cURL** para enviar una solicitud GET a `http://localhost:8080` y verificar que la API responda correctamente.
+
+4. **Cierre:**
+
+    - Detén y elimina el contenedor.
+
+    - Elimina la imagen de la aplicación para dejar el sistema limpio.
