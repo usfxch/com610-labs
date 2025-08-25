@@ -182,7 +182,7 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
               "scripts": {
                 "start": "node app.js"
               },
-              "author": "Tu Nombre",
+              "author": "COM610",
               "license": "ISC",
               "dependencies": {}
             }
@@ -213,7 +213,7 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
 
         - **Verifica:** Abre tu navegador y visita [http://localhost:8080](http://localhost:8080).
 
-3.  **Ejemplo con Gestión de Dependencias (Más Complejo)**
+3.  **Ejemplo con Gestión de Dependencias**
 
     - `Dockerfile`:
         ```Dockerfile
@@ -317,25 +317,80 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
             docker run -d -p 8080:8000 mi-app-python:1.0
             ```
         
-### Práctica Individual (Tarea de Mayor Complejidad) 💻
+### Práctica Individual 💻
 
-Tu objetivo es crear una imagen de Docker para una aplicación de API simple (utilizando [ExpressJS](https://expressjs.com/), [Flask](https://flask.palletsprojects.com/en/stable/) u otro) que devuelva un mensaje. Esta tarea consolidará tus conocimientos sobre la estructura de un proyecto y la gestión de dependencias.
+**Objetivo:**
 
-1. **Configuración del Proyecto:**
+Crear una API REST simple con operaciones CRUD sobre una lista de elementos que residen en memoria. Esta práctica consolida el uso del `Dockerfile` con más dependencias y la ejecución de una aplicación más robusta.
 
-    - Crea una carpeta y los archivos de código necesarios para una API básica.
+**Instrucciones:**
 
-2. **Construcción de la Imagen:**
+1.  **Selección de Tecnología:** Elige entre Node.js con [Express.js](https://expressjs.com/) o Python con [Flask](https://flask.palletsprojects.com/en/stable/.
 
-    - Escribe un `Dockerfile` que use una imagen base adecuada, instale las dependencias y construya la imagen.
+2. **Configuración del Proyecto:**
 
-3. **Ejecución y Verificación:**
+    - Crea una nueva carpeta para tu proyecto (por ejemplo, `api-crud`).
 
-    - Inicia el contenedor de tu API. Asegúrate de mapear el puerto de la API al puerto 8080 de tu máquina local.
+    - Crea un archivo principal para tu código (`app.js` o `app.py`).
 
-    - Utiliza tu navegador o una herramienta como **Postman** o **cURL** para enviar una solicitud GET a `http://localhost:8080` y verificar que la API responda correctamente.
+    - Crea un archivo para las dependencias (`package.json` para Node.js o `requirements.txt` para Python).
 
-4. **Cierre:**
+3. **Implementación del CRUD en Memoria:**
+
+    - **Para Node.js:**
+
+        - Instala Express.js: `npm install express`
+
+        - Escribe el código en `app.js` para crear una API que gestione una lista de, por ejemplo, "autores" (authors).
+
+        - Implementa los siguientes endpoints:
+
+            - `GET /authors`: Para listar todas las tareas.
+
+            - `POST /authors`: Para crear una nueva tarea.
+
+            - `PUT /authors/:id`: Para actualizar una tarea existente.
+
+            - `DELETE /authors/:id`: Para borrar una tarea.
+
+        - La API debe escuchar en el puerto 3000.
+
+    - **Para Python:**
+
+        - Instala Flask: `pip install Flask`
+
+        - Escribe el código en `app.py` para crear una API que gestione una lista de, por ejemplo, "libros" (`books`).
+
+        - Implementa los siguientes endpoints:
+
+            - `GET /books`: Para listar todos los libros.
+
+            - `POST /books`: Para crear un nuevo libro.
+
+            - `PUT /books/<id>`: Para actualizar un libro existente.
+
+            - `DELETE /books/<id>`: Para borrar un libro.
+
+        - La API debe escuchar en el puerto 5000.
+
+
+4. **Creación de la Imagen Docker:**
+
+    - Escribe un `Dockerfile` para tu proyecto, siguiendo el enfoque de optimización.
+
+    - Asegúrate de que el Dockerfile exponga el puerto correcto (`3000` para Node.js o `5000` para Python).
+
+    - Construye la imagen con un nombre y versión específicos.
+
+5. **Ejecución y Verificación:**
+
+    - Inicia el contenedor de tu API. Mapea el puerto de la aplicación (3000 o 5000) a un puerto local (como `8080`).
+
+    - Utiliza una herramienta como **Postman** o **cURL** para enviar solicitudes y probar todos los endpoints del CRUD (`GET`, `POST`, `PUT`, `DELETE`).
+
+    - Verifica que la API funcione correctamente.
+
+6. **Cierre:**
 
     - Detén y elimina el contenedor.
 
