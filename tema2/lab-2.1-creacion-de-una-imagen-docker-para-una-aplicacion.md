@@ -120,3 +120,34 @@ Estos ejercicios están diseñados para que te familiarices con los comandos de 
 
     - `docker logs -f <ID o Nombre>`: Muestra los logs en tiempo real (--follow).
 
+### Ejercicio 2: Creación de Imágenes con Dockerfile
+
+Un `Dockerfile` es un archivo de texto con instrucciones para construir una imagen. El comando docker build lee el `Dockerfile` y construye la imagen.
+
+1.  **Ejemplo Básico: Una imagen de bienvenida**
+
+    - **Crea un `Dockerfile` con el siguiente contenido:**
+
+        ```Dockerfile
+        FROM alpine
+        CMD ["echo", "¡Hola desde mi primera imagen Docker!"]
+        ```
+
+    - **Cómo ejecutarlo 🚀:**
+        - **Construye la imagen:**
+        
+            ```bash
+            docker build -t hola-mundo:1.0 .
+            ```
+
+            > El `.` al final es crucial, ya que indica el directorio de contexto de la construcción.
+
+        - Ejecuta el contenedor:
+            ```bash
+            docker run --rm hola-mundo:1.0
+            ```
+            > El contenedor imprimirá el mensaje y luego se detendrá y eliminará (`--rm`).
+
+
+
+    
