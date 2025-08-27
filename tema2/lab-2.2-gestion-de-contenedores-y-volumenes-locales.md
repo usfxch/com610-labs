@@ -147,12 +147,12 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
     
     - **Modifica parte del contenido del archivo `package.json`**:
         ```JSON
-        //...
+        //
         "scripts": {
           "start": "node index.js",
           "dev": "nodemon index.js"
         },
-        //...
+        //
         ```
 
     - **Crea el archivo `Dockerfile` con el siguiente contenido:**
