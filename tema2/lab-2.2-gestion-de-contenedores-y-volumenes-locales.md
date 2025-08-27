@@ -90,10 +90,14 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     - **Inicia un nuevo contenedor con el mismo volumen:**
         ```bash
-        docker run -d -v datos-mysql:/var/lib/mysql --name nueva-db mariadb
+        docker run -d -v datos-mysql:/var/lib/mysql --name nueva-db --env MARIADB_ROOT_PASSWORD=1234abcd mariadb
         ```
 
     - **Verifica:** Accede a la nueva terminal y comprueba que la base de datos o tabla de prueba aún exista.
+
+        ```bash
+        docker exec -it nueva-db bash
+        ```
 
     - **También puedes montar el volumen en otro contenedor y navegar por su contenido:**
         ```bash
