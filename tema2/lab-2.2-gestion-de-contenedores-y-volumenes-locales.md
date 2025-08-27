@@ -46,7 +46,7 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     - **Comando:**
         ```bash
-        docker run -d -v datos-mysql:/var/lib/mysql --name mi-db mariadb
+        docker run -d -v datos-mysql:/var/lib/mysql --name mi-db --env MARIADB_ROOT_PASSWORD=1234abcd mariadb
         ```
         > Inicia un contenedor de MariaDB y monta el volumen `datos-mysql` en la ruta interna donde la base de datos almacena sus datos (`/var/lib/mysql`).
 
@@ -57,7 +57,31 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
         docker exec -it mi-db bash
         ```
 
-    - Una vez dentro, crea una base de datos o tabla de prueba. Sal de la terminal con `exit`.
+    - Una vez dentro, **crea una base de datos o tabla de prueba**. Sal de la terminal con `quit`.
+
+        ```bash
+        mariadb -u root -p
+        ```
+        > Accede al CLI de MariaDB
+
+        ```sql
+        CREATE DATABASE test;
+        ```
+        > Crea la base de datos
+
+        ```sql
+        USE test;
+        ```
+        > Selecciona la base de datos
+
+        ```sql
+        CREATE TABLE usuarios (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(100),
+            email VARCHAR(255) UNIQUE
+        );
+        ```
+        > Crea una tabla dentro de la base de datos
 
     - **Detén y elimina el contenedor:**
         ```bash
@@ -70,3 +94,14 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
         ```
 
     - **Verifica:** Accede a la nueva terminal y comprueba que la base de datos o tabla de prueba aún exista.
+
+    - **También puedes montar el volumen en otro contenedor y navegar por su contenido:**
+        ```bash
+        docker volume inspect my_volume_name 
+        ```
+        > Identifica el punto de montaje para ver los detalles del volumen, incluyendo su ruta en el sistema de archivos del host.
+
+        ```bash
+        docker run -it --rm -v <nombre_del_volumen>:/data alpine sh 
+        ```
+        > Inicia un contenedor temporal con el volumen montado en un directorio (por ejemplo, `/data`) y abre un shell en él.
