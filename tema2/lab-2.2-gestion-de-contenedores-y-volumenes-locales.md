@@ -97,11 +97,11 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     - **También puedes montar el volumen en otro contenedor y navegar por su contenido:**
         ```bash
-        docker volume inspect my_volume_name 
+        docker volume inspect datos-mysql 
         ```
         > Identifica el punto de montaje para ver los detalles del volumen, incluyendo su ruta en el sistema de archivos del host.
 
         ```bash
-        docker run -it --rm -v <nombre_del_volumen>:/data alpine sh 
+        docker run -it --rm -v datos-mysql:/data alpine sh 
         ```
         > Inicia un contenedor temporal con el volumen montado en un directorio (por ejemplo, `/data`) y abre un shell en él.
