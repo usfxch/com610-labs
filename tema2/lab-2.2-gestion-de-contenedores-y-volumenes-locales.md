@@ -207,8 +207,52 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     **Verificación:**
     ```bash
-    ping -c 3 db-cont
+    ping -c 3 db-con-red
     ```
     > Dentro de la terminal del contenedor, ejecuta este comando para enviar paquetes a la base de datos.
 
     > **Resultado esperado:** Verás una respuesta exitosa, lo que confirma que los contenedores pueden comunicarse entre sí usando sus nombres de servicio.
+
+### 4. Práctica Individual 💻
+
+**Objetivo**
+
+Desplegar una aplicación de múltiples servicios (un CMS de blog y su base de datos) usando volúmenes para la persistencia de datos y una red de Docker para la comunicación.
+
+**Instrucciones**
+
+1. **Creación de la Red y el Volumen:**
+
+    - Crea una red personalizada de Docker llamada `mi-blog-red`.
+
+    - Crea un volumen llamado `datos-blog-db`.
+
+2. **Despliegue de la Base de Datos:**
+
+    - Ejecuta una imagen de base de datos (`mariadb`) en modo `detached`.
+
+    - Conéctala a la red `mi-blog-red` y monta el volumen `datos-blog-db`.
+
+    - Configura las variables de entorno necesarias para la base de datos.
+
+3. **Despliegue del Blog (WordPress):**
+
+    - Ejecuta la imagen oficial de WordPress en modo `detached`.
+
+    - Conéctala a la misma red `mi-blog-red`.
+
+    - Asegúrate de que WordPress pueda comunicarse con la base de datos usando el nombre de su contenedor.
+
+    - Mapea el puerto del contenedor de WordPress a un puerto de tu máquina local.
+
+    - Configura las variables de entorno para la conexión a la base de datos.
+
+4. **Verificación:**
+
+    - Accede a la instalación de WordPress desde tu navegador y completa la configuración.
+
+    - Crea una entrada de blog de prueba.
+
+    - Detén y elimina ambos contenedores.
+
+    - Inicia nuevamente solo el contenedor de WordPress (sin eliminar el volumen). ¿Puedes ver la entrada de blog que creaste? Si lo hiciste correctamente, los datos persistirán.
