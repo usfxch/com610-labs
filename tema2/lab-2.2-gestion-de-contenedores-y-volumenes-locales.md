@@ -213,13 +213,90 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     > **Resultado esperado:** Verás una respuesta exitosa, lo que confirma que los contenedores pueden comunicarse entre sí usando sus nombres de servicio.
 
+### Ejercicio 3.4: Redes y Balanceo de Carga con Nginx
+
+1. **Creación de una Red Personalizada:**
+
+    ```bash
+    docker network create web-red
+    ```
+    > Crea una red dedicada para este ejercicio.
+
+2. **Preparación de los Servidores de Aplicación:**
+
+    - **Crear archivos `index.html`:**
+        - `servidor1/index.html`:
+        ```html
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Servidor 1</title>
+        </head>
+        <body>
+            ¡Hola desde el Servidor 1!
+        </body>
+        </html>
+        ```
+
+        - `servidor2/index.html`:
+        ```html
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Servidor 2</title>
+        </head>
+        <body>
+            ¡Hola desde el Servidor 2!
+        </body>
+        </html>
+        ```
+
+    - **Ejemplo:** Inicia dos contenedores de Nginx, cada uno con su propio archivo `index.html`, en la red que creaste.
+        ```bash
+        docker run -d --network web-red --name servidor1 -v $(pwd)/servidor1:/usr/share/nginx/html nginx
+        ```
+
+        ```bash
+        docker run -d --network web-red --name servidor2 -v $(pwd)/servidor2:/usr/share/nginx/html nginx
+        ```
+3. **Configuración del Balanceador de Carga Nginx:**
+
+    - Archivo `nginx.conf`:
+        ```nginx
+        events { }
+        http {
+            upstream balanceador {
+                server servidor1;
+                server servidor2;
+            }
+            server {
+                listen 80;
+                location / {
+                    proxy_pass http://balanceador;
+                }
+            }
+        }
+        ```
+    
+    - **Ejemplo:** Inicia un tercer contenedor de Nginx que actúe como balanceador de carga, montando el archivo de configuración y conectándolo a la misma red:
+
+        ```bash
+        docker run -d --network web-red -p 8080:80 --name balanceador -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf nginx
+        ```
+    
+    - **Verificación:** Accede a `http://localhost:8080` en tu navegador. Al recargar la página, Nginx alternará entre "¡Hola desde el Servidor 1!" y "¡Hola desde el Servidor 2!", demostrando el balanceo de carga.
+
 ### 4. Práctica Individual 💻
 
 **Objetivo**
 
 Desplegar una aplicación de múltiples servicios (un CMS de blog y su base de datos) usando volúmenes para la persistencia de datos y una red de Docker para la comunicación.
 
-**Instrucciones**
+**Instrucciones:**
 
 1. **Creación de la Red y el Volumen:**
 
@@ -255,4 +332,4 @@ Desplegar una aplicación de múltiples servicios (un CMS de blog y su base de d
 
     - Detén y elimina ambos contenedores.
 
-    - Inicia nuevamente solo el contenedor de WordPress (sin eliminar el volumen). ¿Puedes ver la entrada de blog que creaste? Si lo hiciste correctamente, los datos persistirán.
+    - Inicia nuevamente solo el contenedor de WordPress (sin eliminar el volumen). ¿Puedes ver la entrada de blog que creaste? **Si lo hiciste correctamente, los datos persistirán.**
