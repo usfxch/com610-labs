@@ -190,20 +190,20 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
 2. **Conexión de Contenedores a la Red:**
     ```bash
-    docker run -d --network mi-red-app --name db-con-red mariadb
+    docker run -d --network mi-red-app --name db-con-red --env MARIADB_ROOT_PASSWORD=1234abcd mariadb
     ```
 
     ```bash
-    docker run -d --network mi-red-app --name app-con-red mi-app-web:2.0
+    docker run --network mi-red-app --name app-con-red -it ubuntu:22.04 bash
     ```
 
     Los contenedores `db-con-red` y `app-con-red` se inician en la misma red y son accesibles por sus nombres.
 
 3. **Verificación de la Comunicación:**
     ```bash
-    docker exec -it app-con-red bash
+    apt-get update && apt-get install -y iputils-ping
     ```
-    > Accede a la terminal del contenedor de la aplicación.
+    > Instala el paquete `ping` en el contenedor.
 
     **Verificación:**
     ```bash
