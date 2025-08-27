@@ -109,3 +109,27 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
         docker run -it --rm -v datos-mysql:/data alpine sh 
         ```
         > Inicia un contenedor temporal con el volumen montado en un directorio (por ejemplo, `/data`) y abre un shell en él.
+
+### Ejercicio 3.2: Volúmenes para Persistencia y Hot Reload
+
+1. **Montaje de Volúmenes para "Hot Reload" en Desarrollo:**
+
+    - **Contexto:** Para este ejercicio, utiliza el código del servidor web de Express.js del laboratorio anterior, pero en tu `package.json` instala `nodemon` como una dependencia de desarrollo (`npm install nodemon --save-dev`).
+
+    - **Modifica el `Dockerfile`:** Cambia el comando `CMD` para que ejecute `nodemon` en lugar de `node`.
+
+    - **Comando de ejecución:**
+    
+        ```bash
+        docker run -d -p 3000:3000 -v "$(pwd):/app" --name dev-app mi-app-web:1.0`
+        ```
+
+        > El comando usa un **montaje de enlace** (`-v "$(pwd):/app"`), que vincula el directorio de trabajo actual (`$(pwd)`) en tu máquina al directorio `/app` del contenedor.
+
+2. **Pruebas de Hot Reload:**
+
+    - **Verificación inicial:** Abre tu navegador y visita `http://localhost:3000`. Deberías ver la respuesta inicial de la aplicación.
+
+    - **Realiza un cambio:** Modifica el mensaje de respuesta en el archivo `app.js` en tu editor de código.
+
+    - **Observa el resultado:** Sin detener o reiniciar el contenedor, recarga la página en tu navegador. Deberías ver el nuevo mensaje. Esto demuestra que `nodemon` detectó el cambio en el archivo montado y reinició la aplicación.
