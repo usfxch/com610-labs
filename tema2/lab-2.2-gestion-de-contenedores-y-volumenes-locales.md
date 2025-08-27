@@ -147,12 +147,10 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
     
     - **Modifica parte del contenido del archivo `package.json`**:
         ```JSON
-        //
         "scripts": {
           "start": "node index.js",
           "dev": "nodemon index.js"
         },
-        //
         ```
 
     - **Crea el archivo `Dockerfile` con el siguiente contenido:**
@@ -181,3 +179,36 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
     - **Realiza un cambio:** Modifica el mensaje de respuesta en el archivo `app.js` en tu editor de código.
 
     - **Observa el resultado:** Sin detener o reiniciar el contenedor, recarga la página en tu navegador. Deberías ver el nuevo mensaje. Esto demuestra que `nodemon` detectó el cambio en el archivo montado y reinició la aplicación. Puedes utilizar `docker logs -f mi-web-app-dev` para ver cómo se reinicia la aplicación
+
+### Ejercicio 3.3: Redes para la Comunicación entre Contenedores
+
+1. **Creación de una Red Personalizada:**
+    ```bash
+    docker network create mi-red-app
+    ```
+    > Crea una red `bridge` aislada para que los contenedores se comuniquen entre sí por su nombre.
+
+2. **Conexión de Contenedores a la Red:**
+    ```bash
+    docker run -d --network mi-red-app --name db-con-red mariadb
+    ```
+
+    ```bash
+    docker run -d --network mi-red-app --name app-con-red mi-app-web:2.0
+    ```
+
+    Los contenedores `db-con-red` y `app-con-red` se inician en la misma red y son accesibles por sus nombres.
+
+3. **Verificación de la Comunicación:**
+    ```bash
+    docker exec -it app-con-red bash
+    ```
+    > Accede a la terminal del contenedor de la aplicación.
+
+    **Verificación:**
+    ```bash
+    ping -c 3 db-cont
+    ```
+    > Dentro de la terminal del contenedor, ejecuta este comando para enviar paquetes a la base de datos.
+
+    > **Resultado esperado:** Verás una respuesta exitosa, lo que confirma que los contenedores pueden comunicarse entre sí usando sus nombres de servicio.
