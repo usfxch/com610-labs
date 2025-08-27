@@ -114,16 +114,64 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
 1. **Montaje de Volúmenes para "Hot Reload" en Desarrollo:**
 
-    - **Contexto:** Para este ejercicio, utiliza el código del servidor web de Express.js del laboratorio anterior, pero en tu `package.json` instala `nodemon` como una dependencia de desarrollo (`npm install nodemon --save-dev`).
-
-    - **Modifica el `Dockerfile`:** Cambia el comando `CMD` para que ejecute `nodemon` en lugar de `node`.
-
-    - **Comando de ejecución:**
-    
+    - **Contexto:** Para este ejercicio, crea un proyecto y configura las dependencias para trabajar con los paquetes de `express` (Framework minimalista) y `nodemon` (dependencia para "Hot Reload").
         ```bash
-        docker run -d -p 3000:3000 -v "$(pwd):/app" --name dev-app mi-app-web:1.0`
+        npm init
+        ```
+        > Creación de proyecto con NodeJS
+
+        ```bash
+        npm install express
+        ```
+        > Instala los paquetes del **Framework ExpressJS**
+
+        ```bash
+        npm install nodemon --save-dev
+        ```
+        > Instala los paquetes de `nodemon` como dependencias de desarrollo.
+
+    - **Modifica el contenido del archivo principal del proyecto `index.js`:**
+        ```Javascript
+        const express = require('express');
+        const app = express();
+        const port = 3000;
+
+        app.get('/', (req, res) => {
+          res.send('Hello World!');
+        });
+
+        app.listen(port, () => {
+          console.log(`Example app listening on port ${port}`);
+        });
+        ```
+    
+    - **Modifica parte del contenido del archivo `package.json`**:
+        ```JSON
+        //...
+        "scripts": {
+          "start": "node index.js",
+          "dev": "nodemon index.js"
+        },
+        //...
         ```
 
+    - **Crea el archivo `Dockerfile` con el siguiente contenido:**
+        ```Dockerfile
+        FROM node:20-alpine
+        WORKDIR /app
+        COPY . .
+        CMD ["npm", "run", "dev"]
+        ```
+
+    - **Construye la imagen:**
+        ```bash
+        docker build -t mi-app-web:2.0 .
+        ```
+
+    - **Ejecuta el contenedor:**
+        ```bash
+        docker run -d -p 3000:3000 -v "$(pwd):/app" --name mi-app-web-dev mi-app-web:2.0
+        ```
         > El comando usa un **montaje de enlace** (`-v "$(pwd):/app"`), que vincula el directorio de trabajo actual (`$(pwd)`) en tu máquina al directorio `/app` del contenedor.
 
 2. **Pruebas de Hot Reload:**
@@ -132,4 +180,4 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
     - **Realiza un cambio:** Modifica el mensaje de respuesta en el archivo `app.js` en tu editor de código.
 
-    - **Observa el resultado:** Sin detener o reiniciar el contenedor, recarga la página en tu navegador. Deberías ver el nuevo mensaje. Esto demuestra que `nodemon` detectó el cambio en el archivo montado y reinició la aplicación.
+    - **Observa el resultado:** Sin detener o reiniciar el contenedor, recarga la página en tu navegador. Deberías ver el nuevo mensaje. Esto demuestra que `nodemon` detectó el cambio en el archivo montado y reinició la aplicación. Puedes utilizar `docker logs -f mi-web-app-dev` para ver cómo se reinicia la aplicación
