@@ -1,6 +1,6 @@
 # Laboratorio 2.1: Creación de una Imagen Docker para una Aplicación
 
-## Objetivos del Laboratorio 🎯
+## 1. Objetivos del Laboratorio 🎯
 
 Al finalizar este laboratorio, el estudiante será capaz de:
 
@@ -12,7 +12,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 - Ejecutar un contenedor a partir de una imagen y depurar problemas de ejecución.
 
-## Requisitos ⚙️
+## 2. Requisitos ⚙️
 
 - Un sistema operativo con **Docker Desktop** o **Docker Engine** instalado y funcionando.
 
@@ -22,11 +22,11 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 - Un proyecto de aplicación web simple (se proporciona un ejemplo).
 
-## Ejercicios 🧪
+## 3. Ejercicios 🧪
 
 Estos ejercicios están diseñados para que te familiarices con los comandos de Docker de forma gradual y práctica.
 
-### **Ejercicio 1: Gestión de Imágenes y Contenedores**
+### Ejercicio 3.1: Gestión de Imágenes y Contenedores
 
 1.  **Verificación de la Instalación y Listado de Imágenes:**
 
@@ -120,7 +120,7 @@ Estos ejercicios están diseñados para que te familiarices con los comandos de 
 
     - `docker logs -f <ID o Nombre>`: Muestra los logs en tiempo real (--follow).
 
-### Ejercicio 2: Creación de Imágenes con Dockerfile
+### Ejercicio 3.2: Creación de Imágenes con Dockerfile
 
 Un `Dockerfile` es un archivo de texto con instrucciones para construir una imagen. El comando docker build lee el `Dockerfile` y construye la imagen.
 
@@ -317,7 +317,7 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
             docker run -d -p 8080:8000 mi-app-python:1.0
             ```
         
-### Práctica Individual 💻
+### 4. Práctica Individual 💻
 
 **Objetivo:**
 
