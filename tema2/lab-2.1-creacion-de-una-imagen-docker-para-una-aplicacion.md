@@ -314,7 +314,7 @@ Un `Dockerfile` es un archivo de texto con instrucciones para construir una imag
 
         - **Ejecuta el contenedor:**
             ```bash
-            docker run -d -p 8080:8000 mi-app-python:1.0
+            docker run -d -p 8080:5000 mi-app-python:1.0
             ```
         
 ### 4. Práctica Individual 💻
