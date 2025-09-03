@@ -8,7 +8,7 @@
 
 ---
 
-### Tema 1: Introducción al Cloud Computing
+## Tema 1: Introducción al Cloud Computing
 
 - Laboratorio 1.1: Repaso y administración de GNU/Linux (Ubuntu Server).
 - Laboratorio 1.2: Creación de cuenta en AWS y exploración de la consola de gestión.
