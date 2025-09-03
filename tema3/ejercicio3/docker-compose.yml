@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: example_wordpress_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306" # ¡Cuidado en producción! Exponer el puerto directamente no es seguro.
+    restart: always
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: example_wordpress_password
+    volumes:
+      - wordpress_data:/var/www/html
+    ports:
+      - "8080:80"
+    restart: always
+volumes:
+  db_data:
+  wordpress_data:
