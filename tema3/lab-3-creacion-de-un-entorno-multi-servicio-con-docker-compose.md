@@ -263,7 +263,7 @@ services:
     image: wordpress
     restart: always
     ports:
-      - "808080:80"
+      - "8080:80"
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_NAME: wordpress
