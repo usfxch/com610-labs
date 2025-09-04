@@ -61,13 +61,13 @@ services:
     docker compose up -d
     ``` 
     > Esto en el directorio donde está `docker-compose.yml`.
-4.  Abre tu navegador y ve a `http://localhost`. Deberías ver el contenido de tu `index.html`.
+4.  Abre tu navegador y ve a `http://localhost:8080`. Deberías ver el contenido de tu `index.html`.
 5.  Para detener y eliminar los contenedores, ejecuta:
     ```bash
     docker compose down
     ```
 
-### Ejercicio 2: Balanceador de Carga con Nginx y Proxy Inverso con Docker Compose
+### Ejercicio 3.2: Balanceador de Carga con Nginx y Proxy Inverso con Docker Compose
 
 Este ejemplo configura un balanceador de carga Nginx frente a 3 contenedores que simulan aplicaciones web. Uno de los contenedores Nginx actuará como el balanceador de carga y proxy inverso.
 
@@ -228,17 +228,17 @@ networks:
 
 **Verificación:**
 
-1.  Abre tu navegador web y ve a `http://localhost`.
-2.  Recarga la página varias veces. Deberías ver que el contenido cambia entre "¡Hola desde la Aplicación 1!", "¡Saludos desde la Aplicación 2!", "¡Bienvenidos a la Aplicación 3!" y "¡Aloha desde la Aplicación 4!". Esto demuestra que el balanceador de carga Nginx está distribuyendo las peticiones entre los cuatro contenedores de la aplicación backend.
+1.  Abre tu navegador web y ve a `http://localhost:8080`.
+2.  Recarga la página varias veces. Deberías ver que el contenido cambia entre "¡Hola desde la Aplicación 1!", "¡Saludos desde la Aplicación 2!" y "¡Bienvenidos a la Aplicación 3!". Esto demuestra que el balanceador de carga Nginx está distribuyendo las peticiones entre los tres contenedores de la aplicación backend.
 
 **Explicación del Proxy Inverso:**
 
-En esta configuración, el contenedor `loadbalancer` que ejecuta Nginx actúa como un **proxy inverso**. Recibe todas las peticiones de los clientes (tu navegador) y las reenvía a los servidores backend (`app1`, `app2`, `app3`, `app4`) según la configuración del balanceo de carga. Los clientes no interactúan directamente con las aplicaciones backend; solo se comunican con el proxy inverso.
+En esta configuración, el contenedor `loadbalancer` que ejecuta Nginx actúa como un **proxy inverso**. Recibe todas las peticiones de los clientes (tu navegador) y las reenvía a los servidores backend (`app1`, `app2`, `app3`) según la configuración del balanceo de carga. Los clientes no interactúan directamente con las aplicaciones backend; solo se comunican con el proxy inverso.
 
-Este ejemplo básico muestra cómo configurar un balanceador de carga con Nginx utilizando Docker Compose. En un escenario real, tus aplicaciones backend serían contenedores con tu código de aplicación real (Express.js, Python/Flask, etc.). La configuración del `upstream` en `nginx.conf` dirigiría el tráfico a esos contenedores.
+Este ejemplo básico muestra cómo configurar un balanceador de carga con Nginx utilizando Docker Compose. En un escenario real, tus aplicaciones backend serían contenedores con tu código de aplicación real (Express.js, Python/Flask, etc.). La configuración del `upstream` en `nginx.conf` dirigiría el tráfico a esos contenedores. **Ahora como práctica, modifica el `docker-compose.yml` y `nginx.conf` para añadir un contenedor más (`app4`) y balancear las peticiones también a éste.**
 
 
-### Ejercicio 3: Aplicación Web con Base de Datos (WordPress y MySQL)
+### Ejercicio 3.3: Aplicación Web con Base de Datos (WordPress y MySQL)
 
 Este es un ejemplo clásico de una aplicación web que depende de una base de datos.
 
@@ -269,17 +269,14 @@ services:
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: password123
-    volumes:
-      - wordpress_data:/var/www/html
 volumes:
   db_data:
-  wordpress_data:
 ```
 
 **Explicación:**
 
   * Se definen dos servicios: `wordpress` y `db` (MySQL).
-  * `wordpress`: Utiliza la imagen de WordPress y depende del servicio `db` (asegurando que MySQL se inicie primero). Se configuran las variables de entorno para conectar WordPress a la base de datos MySQL (usando el nombre del servicio `db` como hostname). También se crea un volumen (`wordpress_data`) para la persistencia de los archivos de WordPress.
+  * `wordpress`: Utiliza la imagen de WordPress y depende del servicio `db` (asegurando que MySQL se inicie primero). Se configuran las variables de entorno para conectar WordPress a la base de datos MySQL (usando el nombre del servicio `db` como hostname).
   * `db`: Configura la imagen de MySQL y las variables de entorno para la base de datos. Se crea un volumen con nombre (`db_data`) para persistir los datos de la base de datos.
   * `volumes:`: Define los volúmenes con nombre utilizados por los servicios.
 
@@ -299,7 +296,7 @@ volumes:
     docker compose down -v
     ```
 
-### Ejercicio 4: Múltiples Instancias de un Servicio (Escalado)
+### Ejercicio 3.4: Múltiples Instancias de un Servicio (Escalado)
 
 Docker Compose permite escalar servicios fácilmente.
 
@@ -331,7 +328,7 @@ services:
     docker compose scale web=1
     ```
 
-### Ejercicio 5: Aplicación en NodeJS conectandose a MongoDB
+### Ejercicio 3.5: Aplicación en NodeJS conectandose a MongoDB
 
 ```bash
 docker compose up -d
@@ -341,7 +338,7 @@ docker compose up -d
 docker compose down
 ```
 
-### Ejercicio 6: Aplicación en NodeJS conectandose a MySQL
+### Ejercicio 3.6: Aplicación en NodeJS conectandose a MySQL
 
 ```bash
 docker compose up -d
