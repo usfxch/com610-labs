@@ -393,13 +393,13 @@ Refactorizar el proyecto CRUD del Laboratorio 2.1 para que, en lugar de almacena
 
 4. **Ejecución y Verificación:**
 
-    - Para **desarrollo**, levanta el entorno con: `docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build`. Realiza un cambio en tu código y verifica que se refleje automáticamente.
+    - Para **desarrollo**, levanta el entorno con: `docker compose -f docker-compose.dev.yml up`. Realiza un cambio en tu código y verifica que se refleje automáticamente.
 
-    - Para **producción**, levanta el entorno simplemente con: `docker-compose up -d --build`.
+    - Para **producción**, levanta el entorno simplemente con: `docker compose up -d --build`.
 
     - Usa una herramienta como Postman para probar los endpoints del CRUD.
 
-    - Detén el entorno con `docker-compose down`.
+    - Detén el entorno con `docker compose down`.
 
 
 #### Práctica 2: Despliegue de un Blog con Doble Volumen
@@ -432,7 +432,7 @@ Desplegar un entorno de blog funcional, utilizando WordPress y MySQL como servic
 
 4. **Ejecución y Verificación:**
 
-    - Levanta el entorno con `docker-compose up -d`.
+    - Levanta el entorno con `docker compose up -d`.
 
     - Accede a la URL de WordPress, completa la configuración y crea una entrada de blog y sube una imagen.
 
