@@ -47,7 +47,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 4. Establece la conexión a la base de datos RDS utilizando su **Endpoint** y las credenciales definidas. Confirma la conexión exitosa.
 
 
-### Ejercicio 3.3: Orquestación Simplificada con Amazon Lightsail
+### Ejercicio 3.3: Orquestación Simplificada con Amazon Lightsail (OJO: solo estudiantes que tengan habilitado LightSail)
 
 1. Despliega una instancia de cómputo en **Amazon Lightsail** con una distribución Linux base, asegurándote de que tenga una IP pública estática asignada.
 
@@ -65,7 +65,7 @@ El estudiante debe integrar la API CRUD de los laboratorios anteriores en la inf
 
 2. **Conexión y Pruebas:** Modifica la configuración de la API para que se conecte a la instancia de **Amazon RDS** desplegada en el Ejercicio 3.2.
 
-3. **Acceso Web:** Modifica el **Grupo de Seguridad de la instancia EC2** para permitir el tráfico **HTTP** o **HTTPS** (puerto 80 o 443) desde cualquier dirección IP.
+3. **Acceso Web:** Modifica el **Grupo de Seguridad de la instancia EC2** para permitir el tráfico **HTTP** o **HTTPS** (puerto 80 o 443) desde cualquier dirección IP. Proporciona el IP al Docente para que te asigne un subdominio.
 
 4. **Verificación de CRUD:** Utilizando **Postman** o la interfaz de Swagger, el estudiante debe crear una colección de peticiones que pruebe las cuatro operaciones del CRUD (Create, Read, Update, Delete) de la API, demostrando que:
 
