@@ -125,6 +125,66 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 5. Subir y acceder a objetos del Bucket desde una aplicación NodeJS en nuestra PC.
 
+    Para subir objetos desde una aplicación a un Bucket de AWS S3 debes crear una clave de acceso para un usuario ingresando a **Personas** de **AWS IAM**, luego seleccionando el usuario y haciendo clic en **Crear clave de acceso**.
+
+    ![Creación de clave de acceso](./img/lab42_clave_de_acceso_usuario.png)
+
+    - **Paso 1: Prácticas recomendadas y alternativas para la clave de acceso**
+
+        - Seleccionar **Servicio de terceros** en **Casos de uso** y hacer clic en **Siguiente**.
+
+            ![Caso de uso de clave de acceso](./img/lab42_caso_de_uso_clave_acceso.png)
+
+    - **Paso 2: Establecer el valor de etiqueta de descripción**
+
+        - Mantiene los valores por defecto y haz clic en **Crear clave de acceso**
+
+    - Paso 3: Recuperar claves de acceso
+
+        -  Copia la **Clave de acceso** y **Clave de acceso secreta** en un lugar seguro
+
+            ![Clave de acceso](./img/lab42_clave_de_acceso.png)
+
+    
+    Reemplaza la **Clave de acceso** y **Clave de acceso secreta** en proyecto de NestJS.
+
+    - Clona el proyecto:
+
+        ```bash
+        git clone https://github.com/marceloquispeortega/aws-s3-upload-example
+        ```
+    
+    - Instala dependencias del proyecto:
+
+        ```bash
+        npm install
+        ```
+
+    - Copia el archivo .env.example en .env y añade los valores de las variables de entorno.
+
+        - `AWS_REGION`: región donde está ubicado el Bucket. Por ejemplo: us-east-1
+        - `AWS_ACCESS_KEY_ID`: **Clave de acceso** del usuario de AWS IAM
+        - `AWS_SECRET_ACCESS_KEY`: **Clave de acceso secreta** del usuario de AWS IAM
+        - `AWS_S3_BUCKET_NAME`: nombre único del Bucket
+        - `AWS_S3_CDN`: URL del CDN del CloudFront
+
+    - Ejecuta la aplicación:
+
+        ```bash
+        npm run start:dev
+        ```
+
+    - Con **Postman** crea dos **Requests** para subir archivos y otro para descargar, los endpoints son:
+
+        - `POST` `http://localhost:3000/files/upload`. Enviar el archivo tipo form-data con el key `file`.
+
+            ![Endpoint POST para subir archivos](./img/lab42_endpoint_post_upload.png)
+
+        - `GET` `http://localhost:3000/files/download/<filename>`. Enviar el como `filename` el nombre del archivo.
+
+            ![Endpoint GET para descargar archivos](./img/lab42_endpoint_get_downlad.png)
+
+
 ### Ejercicio 3.2: Implementación de Escalado Horizontal
 
 1. Crea una **Plantilla de Lanzamiento (Launch Template)** para la instancia EC2 que incluya un **Script de Usuario** que instale los *runtime* necesarios para tu API (PHP, Node.js o Python) y un servidor web base (Nginx o Apache).
