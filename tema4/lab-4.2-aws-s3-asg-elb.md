@@ -28,15 +28,102 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 ## 3. Ejercicios 🧪
 
-### Ejercicio 3.1: Gestión de Almacenamiento con Amazon S3 y AWS CLI
+### Ejercicio 3.1: Gestión de Almacenamiento con Amazon S3 y AWS IAM y creación de un CDN con CloudFront
 
 1. Crea un nuevo **Bucket de S3** con un nombre único a nivel global.
 
-2. Utiliza el **AWS CLI** para subir un archivo al bucket.
+    Ingresa a **Amazon S3**,  luego haz clic en **Crear bucket**.
 
-3. Utiliza la **AWS CLI** para cambiar la **Clase de Almacenamiento** del objeto subido de **Standard** a **Standard-IA (Infrequent Access)**, justificando este cambio desde la perspectiva de costos.
+    - En **Configuración general** selecciona:
 
-4. Crea un script de terminal simple utilizando el AWS CLI para listar el contenido del bucket.
+        ![Configuración general](./img/lab42_configuracion_general.png)
+
+        - Tipo de bucket: **Uso general**
+        - Nombre del bucket: `usfx-com610-s3-demo-1234567`. Donde `1234567` sea tu documento de identidad.
+
+
+    - En **Propiedad de objetos** selecciona:
+
+        ![Propiedad de objetos](./img/lab42_propiedades_del_objeto.png)
+
+        - Propiedad del objeto: **ACL deshabilitadas (Recomendado)**
+
+    - En **Configuración de bloqueo de acceso público para este bucket** dejar marcado **Bloquear todo el acceso público**.
+
+    - En **Control de versiones de buckets** mantener en **Desactivar** la opción **Control de versiones de buckets**
+
+    - En **Etiquetas** si deseas agregas las que quieras haciendo referencia al uso que le darás al Bucket.
+
+    - En **Cifrado predeterminado** se mantiene el **Tipo de cifrado** por defecto y en **Clave de bucket** también el por defecto.
+
+    - Por último, haz clic en el botón **Crear bucket**.
+
+
+2. Utiliza **AWS IAM** para configurar el acceso al bucket.
+    
+    Ingresa a **Personas** y haz clic en **Crear persona**.
+
+    - **Paso 1: Especificar los detalles de la persona**
+        
+        - En **Nombre de usuario** introduce `user-s3-demo` y haz clic en **Siguiente**.
+
+    - **Paso 2: Establecer permisos**
+
+        - En **Opciones de permisos** selecciona **Adjuntar políticas directamente**.
+
+            ![Opciones de permisos](./img/lab42_opciones_de_permisos.png)
+
+        - En **Políticas de permisos** busca `amazons3` y selecciona la política **AmazonS3FullAccess** y haz clic en **Siguiente**. OJO: esto lo haremos solo para efectos de práctica, luego se recomienda crear un grupo y otorgar políticas específicas, por ejemplo: de lectura y escritura para un específico Bucket.
+
+            ![Políticas de permisos](./img/lab42_politicas_de_permisos.png)
+
+    - **Paso 3: Revisar y crear**
+
+        - Revisa las opciones seleccionadas y todo está bien haz clic en **Crear Persona** para terminar.
+
+3. Ingresa a **AWS CloudFront** para crear una red de distribución de contenido tomando como base el Bucket creado.
+
+    - Una vez en CloudFront haz clic en **Create distribution**.
+
+    - **Paso 1: Get started**
+
+        - En **Distribution options**, introduce como nombre `cdn-s3-demo` y selecciona **Single website or app** en **Distribution type**.
+
+            ![Opciones de distribución](./img/lab42_distribution_options.png)
+
+        - Deja las demás opciones por defecto y haz clic en **Next**.
+    
+    - **Paso 2: Specify origin**
+
+        - En **Origin type** selecciona **Amazon S3**
+
+            ![alt text](./img/lab42_origin_type.png)  
+
+        - En **Origin** selecciona el Bucket creado y que se utilizará como origen.
+
+            ![alt text](./img/lab42_origin.png)
+
+        - En **Settings** deja las opciones por defecto y haz clic en **Next**.
+
+    - **Paso 3: Enable security**
+
+        - En **Web Application Firewall (WAF)** selecciona **Do not enable security protections** para no habilitar protección con **WAF**.
+    
+    - **Paso 4: Review and create**
+
+        - Revisa las opciones seleccionadas y todo está bien haz clic en **Create distribution** para terminar. 
+
+4. Sube imágenes al Bucket creado desde **Amazon S3**
+
+    - Ingresa a **AmazonS3**, selecciona el Bucket creado y sube archivos desde la pestaña **Objetos**.
+
+    - Comprueba que los archivos estén disponibles en CDN de CloudFront. Para ello ingresa desde el navegador a la dirección del CDN (copia el Distribution domain name) y añade el nombre del archivo al final.
+
+        ![URL del CDN de CloudFront](./img/lab42_url_cdn.png)
+    
+        Por ejemplo: ingresar desde el navegador a https://d1yu0fnc4jb9vu.cloudfront.net/sucre1.jpg
+
+5. Subir y acceder a objetos del Bucket desde una aplicación NodeJS en nuestra PC.
 
 ### Ejercicio 3.2: Implementación de Escalado Horizontal
 
