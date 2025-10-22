@@ -185,38 +185,123 @@ Al finalizar este laboratorio, el estudiante será capaz de:
             ![Endpoint GET para descargar archivos](./img/lab42_endpoint_get_downlad.png)
 
 
-### Ejercicio 3.2: Implementación de Escalado Horizontal
+### Ejercicio 3.2: Implementación de un Balanceador de Carga (ALB)
 
-1. Crea una **Plantilla de Lanzamiento (Launch Template)** para la instancia EC2 que incluya un **Script de Usuario** que instale los *runtime* necesarios para tu API (PHP, Node.js o Python) y un servidor web base (Nginx o Apache).
+1. **Crear grupos de seguridad para acceso Web (HTTP, HTTPS) y para acceso remoto (SSH)**
 
-2. Configura un **Elastic Load Balancer (ELB)** de tipo *Application Load Balancer* y un *Target Group* asociado.
+    - Haz clic sobre Crear grupo de seguridad y crea los grupos `web-securitygroup` y `ssh-seguritygroup`. 
 
-3. Crea un **Auto Scaling Group (ASG)** utilizando la plantilla de lanzamiento.
+        ![alt text](./img/image-9.png)
+    
+    - Para `web-securitygroup` crea Reglas de salida para HTTP y HTTPS
 
-4. Configura el ASG con una capacidad **mínima de 1** instancia y una **máxima de 3** instancias.
+        ![alt text](./img/image-10.png)
 
-5. Adjunta el ASG al *Target Group* del ELB.
+    - Y para `ssh-seguritygroup` crea Reglas de salida para SSH
 
-6. Verifica que una instancia se lanza correctamente y está registrada en el ELB.
+        ![alt text](./img/image-11.png)
 
+1. **Crea dos nuevas instancias con las siguientes características:**
 
-### Ejercicio 3.3: Orquestación Simplificada con Amazon Lightsail
+    - **Nombre y etiquetas**
 
-1. Aísla el *frontend* del tráfico externo configurando las reglas del **Grupo de Seguridad del ELB** para solo permitir el tráfico de los puertos **80** y **443**.
+        - **Nombre:** `alb-server-1` para la primera instancia y `alb-server-2` para la segunda instancia.
 
-2. Configura el **Proxy Inverso (Nginx)** en la plantilla de lanzamiento para que escuche el tráfico HTTP/S y lo enrute a los contenedores de la API (si se usa Docker) o al servicio API local.
+    - **Imágenes de aplicaciones y sistemas operativos**
+        
+        - Selecciona *Inicio rápido* y selecciona **Ubuntu 24.04**.
+            ![alt text](image.png)
 
-3. Configura el **certificado SSL/TLS** en el ELB para manejar el tráfico **HTTPS** (o en el Nginx/servidor web si el ELB es solo HTTP).
+    - **Tipo de instancia:** `t3.micro` o `t2.micro`. Uno apto para la capa gratuita.
 
-4. En el panel de **Cloudflare** o el gestor de DNS (externo), crea un registro **CNAME** o **A** que apunte el **subdominio** (`api-nombreyapellido.dominio.com`) a la **URL DNS del ELB** de AWS.
+        ![alt text](./img/image-1.png)
 
-5. Accede a la URL completa con **HTTPS** y verifica que la conexión es segura y te redirige a tu servicio.
+    - **Par de claves (inicio de sesión):** Continuar sin un par de claves
+
+        ![alt text](./img/image-2.png)
+
+    - **Configuraciones de red:** 
+
+        - Seleccionar **Seleccionar un grupo de seguridad existente** y selecciona las los grupos de seguridad `web-securitygroup`, `ssh-seguritygroup` y `default`.
+
+            ![alt text](./img/image-12.png)
+
+            > Debes hacer lo mismo para la segunda instancia.
+
+    - **Configurar almacenamiento:** Mantener los valores por defecto
+
+    - **Detalles avanzados**
+
+        Dentro de **Datos de usuario** copiar el siguiente código:
+
+        ```
+        #!/bin/bash
+        apt update -y
+        apt install -y nginx
+        systemctl start nginx
+        systemctl enable nginx
+        echo "<h1>Hola Mundo Server - $(hostname -f) con Nginx</h1>" > /var/www/html/index.nginx-debian.html
+        ```
+
+2. Configura un Balanceador de carga de tipo **ALB** (**Application Load Balancer**).
+
+    Haz clic en **Crear balanceador de carga** y luego selecciona **Balanceador de carga de aplicaciones**.
+
+    - **Configuración básica**
+
+        ![alt text](./img/image-4.png)
+
+        - **Nombre del balanceador de carga:** `alb-servers-demo`
+
+        - **Esquema:** Selecciona **Expuesto a Internet**
+
+        - **Tipo de dirección IP del equilibrador de carga:** Selecciona **IPv4**
+
+    - **Mapeo de red**
+
+        - **VPC:** Mantiene el por defecto.
+
+        - **Zonas de disponibilidad y subredes:** Marca todas las zonas de disponibilidad.
+
+    - **Grupos de seguridad:** Selecciona los grupos de seguridad `web-securitygroup` y `default`.
+
+    - **Agentes de escucha y direccionamiento**
+
+        - Haz clic sobre **Cree un grupo de destino** 
+
+            - **Paso 1: Create target group:** Selecciona **Instancias** como tipo de destino, escribe el nombre del grupo, mantiene los valores por defecto y haz clic en **Siguiente**.
+
+                ![alt text](./img/image-5.png)
+
+            - **Paso 2: Registrar destinos:** Selecciona las instancias `alb-server-1` y `alb-server-2` e incluyelas como destino. Y para finalizar haz clic en **Crear un grupo de destino**.
+
+                ![alt text](./img/image-6.png)
+
+        - Selecciona el grupo de destino creado.
+
+            ![alt text](./img/image-7.png)
+
+    - Deja las opciones por defecto y haz clic en **Crear balanceador de carga**.
+
+### Ejercicio 3.3: Implementación de un Escalado Horizontal (ASG y ELB)
+
 
 ### 4. Práctica Individual 💻
 
 El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento elástico y probar su funcionamiento con alta disponibilidad.
 
-1. **Integración de la API:** Despliega el código de la **API CRUD** en el *script de usuario* de la **Plantilla de Lanzamiento** del ASG, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1.
+1. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento** del ASG, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1.
+
+2. **Configuración del ASG para que sea escalable:**
+
+    - Configura el ASG con 1 instancia como mínimo, 2 instancias deseadas y 4 como máximo.
+
+    <!-- - Realiza pruebas de estrés en el procesador y con peticiones tipo GET.  -->
+
+    <!-- - Verifica en base a las pruebas de estrés el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.  -->
+
+    <!-- - Después de las pruebas de estrés verifica que las instancias ya no utilizadas se vuelvan a apagar y retornen a su estado inicial. -->
+
 
 2. **Prueba de Escalabilidad:**
 
@@ -224,6 +309,10 @@ El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento 
 
     - Escala manualmente el ASG a **3 réplicas** y espera a que las nuevas instancias se registren en el ELB.
 
-3. **Verificación de Alta Disponibilidad:** Utiliza **Postman** (o herramienta similar) para ejecutar **múltiples peticiones (ej., 100)** en bucle contra el endpoint `CREATE` o `UPDATE` de la API a través del subdominio, demostrando que todas las réplicas responden y los datos se persisten correctamente en RDS.
+3. **Verificación de Alta Disponibilidad:** 
+
+    - Utiliza **Postman** (o herramienta similar) para ejecutar **múltiples peticiones (ej., 100)** en bucle contra el endpoint `CREATE` o `UPDATE` de la API a través del subdominio, demostrando que todas las réplicas responden y los datos se persisten correctamente en RDS.
+    
+    - Realiza pruebas de estrés en el procesador y/o a través de peticiones para verificar el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.
 
 El resultado final es una aplicación **elástica y segura**, probada y accesible a través de un dominio con **HTTPS**. La evidencia debe incluir capturas de pantalla de la **colección de Postman** y el panel del **ASG** con 3 instancias funcionando.
