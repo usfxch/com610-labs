@@ -290,7 +290,115 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento elástico y probar su funcionamiento con alta disponibilidad.
 
-1. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento** del ASG, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1.
+1. **Crear la instancia RDS MySQL:**
+
+    Crea una instancia de base de datos MySQL en **Amazon RDS**, configurando los detalles como el motor, la clase de instancia, las credenciales y los grupos de seguridad. Sigue los siguientes pasos:
+
+    - Ingresa a **Aurora and RDS** y haz clic en **Crear una base de datos**
+
+    - En **Elegir un método de creación de base de datos** selecciona **Creación estándar**.
+
+    - En **Opciones del motor** selecciona **MySQL**.
+
+    - En **Plantillas** seleccione **Capa gratuita**.
+
+        ![alt text](image.png)
+
+    - En **Configuración** identifica el nombre de la instancia como `db-api-crud-demo`, el **Nombre de usuario maestro** como `admin`, la **Administración de credenciales** como `Autoadministrado` e introduce la contraseña.
+
+    - En **Configuración de la instancia** selecciona una clase de instancia que esté bajo la **capa gratuita**.
+
+        ![alt text](image-1.png)
+
+    - En **Almacenamiento** deja los valores por defecto.
+
+    - En **Conectividad** deja los valores por defecto a excepción de **Grupo de seguridad de VPC (firewall)**, donde debes crear dos nuevos grupos  grupo con el nombre `db-api-crud-rds-securitygroup` y selecciona una zona de disponibilidad (us-east-1a). 
+
+        ![alt text](image-3.png)
+
+2. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento**, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1 o del punto anterior.
+
+    - Lanza una nueva instancia **Amazon EC2** dentro de la **capa gratuita** y asegurate que en **Configuraciones de red** se seleccionen los grupos de seguridad para Web (HTTP y HTTPS), acceso remoto (SSH) y crea un grupo de seguridad para conectarse a la instancia RDS de MySQL.
+
+    - Accede a la instancia e realiza los siguientes pasos:
+
+        - Actualizar los repositorios y paquetes:
+
+            ```bash
+            sudo apt update && sudo apt upgrade
+            ```
+
+        - Instalar **MySQL Client** para probar la conexión con el RDS.
+
+            ```bash
+            sudo apt install mysql
+            ```
+
+        - Instalar Node.js (instrucciones de [Web oficial de Node.js] (https://nodejs.org/es/download)):
+
+            - Descarga e instala `nvm`:
+
+                ```bash
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+                ```
+
+            - En lugar de reiniciar la shell, ejecuta:
+
+                ```bash
+                \. "$HOME/.nvm/nvm.sh"
+                ```
+
+            - Descarga e instala `Node.js`:
+
+                ```bash
+                nvm install 22
+                ```
+            
+            - Verifica la versión de `Node.js`:
+
+                ```bash
+                node -v 
+                ```
+                > Debería mostrar por ejemplo: "v22.21.0".
+
+            - Verifica versión de `npm`:
+
+                ```bash
+                npm -v
+                ```
+                > Debería mostrar por ejemplo: "10.9.4"
+
+        - Instala PM2 (instrucciones de [Web oficial de PM2](https://pm2.keymetrics.io/docs/usage/quick-start/)):
+
+            - Instala el administrador de procesos `PM2` de forma global en tu sistema.
+
+                ```bash
+                npm install pm2@latest -g
+                ```
+            - Verifica la versión de PM2 instalada:
+
+                ```bash
+                pm2 --version
+                ```
+                > Debería mostrar por ejemplo: "6.0.13"
+
+        - Prueba la conexión desde la instancia EC2 hacia el RDS utilizando **MySQL Client**.
+
+            ```bash
+            mysql -U admin -h endpoint-del-rds -p
+            ```
+            > Deberías conectarte sin ningún problema.
+
+        - Clona el proyecto API CRUD Movies
+
+            ```bash
+            git clone https://github.com/marceloquispeortega/api-restful-crud-movies
+            ```
+
+        - Configura el archivo .env con los datos de acceso y configura el PM2 para configurarlo desde el arranque.
+
+        - Crea la Plantilla de lanzamiento a partir de esta instancia.
+
 
 2. **Configuración del ASG para que sea escalable:**
 
