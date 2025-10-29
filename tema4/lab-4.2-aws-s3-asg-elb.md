@@ -97,11 +97,11 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - En **Origin type** selecciona **Amazon S3**
 
-            ![alt text](./img/lab42_origin_type.png)  
+            ![Topo de origen del CDN](./img/lab42_origin_type.png)  
 
         - En **Origin** selecciona el Bucket creado y que se utilizará como origen.
 
-            ![alt text](./img/lab42_origin.png)
+            ![Bucket origen del CDN](./img/lab42_origin.png)
 
         - En **Settings** deja las opciones por defecto y haz clic en **Next**.
 
@@ -191,15 +191,15 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - Haz clic sobre Crear grupo de seguridad y crea los grupos `web-securitygroup` y `ssh-seguritygroup`. 
 
-        ![alt text](./img/lab42_creacion_grupo_seguridad.png)
+        ![Creación del grupo de seguridad](./img/lab42_creacion_grupo_seguridad.png)
     
     - Para `web-securitygroup` crea Reglas de salida para HTTP y HTTPS
 
-        ![alt text](./img/lab42_reglas_web.png)
+        ![Reglas para el acceso por Web](./img/lab42_reglas_web.png)
 
     - Y para `ssh-seguritygroup` crea Reglas de salida para SSH
 
-        ![alt text](./img/lab42_reglas_ssh.png)
+        ![Reglas para el acceso por SSH](./img/lab42_reglas_ssh.png)
 
 1. **Crea dos nuevas instancias con las siguientes características:**
 
@@ -210,7 +210,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
     - **Imágenes de aplicaciones y sistemas operativos**
         
         - Selecciona *Inicio rápido* y selecciona **Ubuntu 24.04**.
-            ![alt text](./img/lab42_imagenes_aws.png)
+            ![Imágenes de AWS](./img/lab42_imagenes_aws.png)
 
     - **Tipo de instancia:** `t3.micro` o `t2.micro`. Uno apto para la capa gratuita.
 
@@ -224,7 +224,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - Seleccionar **Seleccionar un grupo de seguridad existente** y selecciona las los grupos de seguridad `web-securitygroup`, `ssh-seguritygroup` y `default`.
 
-            ![alt text](./img/lab42_configuracion_red.png)
+            ![Configuración de red del EC2](./img/lab42_configuracion_red.png)
 
             > Debes hacer lo mismo para la segunda instancia.
 
@@ -271,77 +271,21 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
             - **Paso 1: Create target group:** Selecciona **Instancias** como tipo de destino, escribe el nombre del grupo, mantiene los valores por defecto y haz clic en **Siguiente**.
 
-                ![alt text](./img/lab42_configuracion_grupo_destino.png)
+                ![Configuración del grupo de destino](./img/lab42_configuracion_grupo_destino.png)
 
             - **Paso 2: Registrar destinos:** Selecciona las instancias `alb-server-1` y `alb-server-2` e incluyelas como destino. Y para finalizar haz clic en **Crear un grupo de destino**.
 
-                ![alt text](./img/lab42_registro_destinos.png)
+                ![Registro de instancias al grupo de destino](./img/lab42_registro_destinos.png)
 
         - Selecciona el grupo de destino creado.
 
-            ![alt text](./img/lab42_seleccion_grupo_destino.png)
+            ![Selección del grupo de destino](./img/lab42_seleccion_grupo_destino.png)
 
     - Deja las opciones por defecto y haz clic en **Crear balanceador de carga**.
 
 ### Ejercicio 3.3: Implementación de un Escalado Horizontal (ASG y ELB)
 
-1. **Crear la instancia RDS MySQL:**
-
-    Crea una instancia de base de datos MySQL en **Amazon RDS**, configurando los detalles como el motor, la clase de instancia, las credenciales y los grupos de seguridad. Sigue los siguientes pasos:
-
-    - Ingresa a **Aurora and RDS** y haz clic en **Crear una base de datos**
-
-    - En **Elegir un método de creación de base de datos** selecciona **Creación estándar**.
-
-    - En **Opciones del motor** selecciona **MySQL**.
-
-    - En **Plantillas** seleccione **Capa gratuita**.
-
-        ![Plantillas RDS](./img/lab42_plantillas_rds.png)
-
-    - En **Disponibilidad y durabilidad** mantiene la opción seleccionada **Implementación de una instancia de base de datos de zona de disponibilidad única (1 instancia)**.
-
-    - Dentro de **Configuración**:
-    
-        - En **Identificador de instancias de bases de datos** coloca el nombre de la instancia como `db-api-crud-demo`.
-        
-        - Dentro de **Configuración de credenciales**:
-        
-            - El **Nombre de usuario maestro** debe ser `admin`.
-            
-            - La **Administración de credenciales** como `Autoadministrado`.
-            
-            - Y por último introduce la contraseña.
-
-    - En **Configuración de la instancia** mantiene las opciones por defecto.
-
-    - En **Almacenamiento** deja los valores por defecto.
-
-    - Dentro de **Conectividad**:
-    
-        - En **Recurso de computación** selecciona **No se conecte a un recurso informático EC2**.
-
-        - En **Nube privada virtual (VPC)** deja los valores por defecto.
-
-        - En **Grupo de subredes de la base de datos** deja los valores por defecto.
-
-        - En **Acceso público** selecciona **No**.
-
-        - En **Grupo de seguridad de VPC (firewall)** selecciona **Elegir existente**.
-
-        - En **Grupos de seguridad de VPC existentes** selecciona **default**.
-
-        - En **Zona de disponibilidad** selecciona **Sin preferencia**.
-
-        - Y por último, en **Proxy de RDS** y **Entidad de certificación** deja los valores por defecto.
-
-    - En **Autenticación de bases de datos** selecciona **Autenticación con contraseña**.
-
-    - En **Supervisión** deja los valores por defecto.
-
-    - En **Configuración adicional** deja los valores por defecto.
-
-2. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento**, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1 o del punto anterior.
+1. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento**, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1 o del punto anterior.
 
     - Lanza una nueva instancia **Amazon EC2** dentro de la **capa gratuita** y asegurate que en **Configuraciones de red** se seleccionen los grupos de seguridad para Web (HTTP y HTTPS), acceso remoto (SSH) y crea un grupo de seguridad para conectarse a la instancia RDS de MySQL.
 
@@ -423,6 +367,64 @@ Al finalizar este laboratorio, el estudiante será capaz de:
         - Configura el archivo .env con los datos de acceso y configura el PM2 para configurarlo desde el arranque.
 
         - Crea la Plantilla de lanzamiento a partir de esta instancia.
+
+2. **Crear la instancia RDS MySQL:**
+
+    Crea una instancia de base de datos MySQL en **Amazon RDS**, configurando los detalles como el motor, la clase de instancia, las credenciales y los grupos de seguridad. Sigue los siguientes pasos:
+
+    - Ingresa a **Aurora and RDS** y haz clic en **Crear una base de datos**
+
+    - En **Elegir un método de creación de base de datos** selecciona **Creación estándar**.
+
+    - En **Opciones del motor** selecciona **MySQL**.
+
+    - En **Plantillas** seleccione **Capa gratuita**.
+
+        ![Plantillas RDS](./img/lab42_plantillas_rds.png)
+
+    - En **Disponibilidad y durabilidad** mantiene la opción seleccionada **Implementación de una instancia de base de datos de zona de disponibilidad única (1 instancia)**.
+
+    - Dentro de **Configuración**:
+    
+        - En **Identificador de instancias de bases de datos** coloca el nombre de la instancia como `db-api-crud-demo`.
+        
+        - Dentro de **Configuración de credenciales**:
+        
+            - El **Nombre de usuario maestro** debe ser `admin`.
+            
+            - La **Administración de credenciales** como `Autoadministrado`.
+            
+            - Y por último introduce la contraseña.
+
+    - En **Configuración de la instancia** mantiene las opciones por defecto.
+
+    - En **Almacenamiento** deja los valores por defecto.
+
+    - Dentro de **Conectividad**:
+    
+        - En **Recurso de computación** selecciona **Conectarse a un recurso informático de EC2** y selecciona la instancia EC2 que creaste en el ejercicio anterior.
+
+            ![Conectividad con la instancia EC2](lab42_conectividad_ec2_rds.png)
+
+        - En **Nube privada virtual (VPC)** deja los valores por defecto.
+
+        - En **Grupo de subredes de la base de datos** deja los valores por defecto.
+
+        - En **Acceso público** selecciona **No**.
+
+        - En **Grupo de seguridad de VPC (firewall)** selecciona **Elegir existente**.
+
+        - En **Grupos de seguridad de VPC existentes** selecciona **default**.
+
+        - En **Zona de disponibilidad** selecciona **Sin preferencia**.
+
+        - Y por último, en **Proxy de RDS** y **Entidad de certificación** deja los valores por defecto.
+
+    - En **Autenticación de bases de datos** selecciona **Autenticación con contraseña**.
+
+    - En **Supervisión** deja los valores por defecto.
+
+    - En **Configuración adicional** deja los valores por defecto.
 
 
 2. **Configuración del ASG para que sea escalable:**
