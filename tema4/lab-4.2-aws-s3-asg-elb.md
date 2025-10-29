@@ -191,15 +191,15 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - Haz clic sobre Crear grupo de seguridad y crea los grupos `web-securitygroup` y `ssh-seguritygroup`. 
 
-        ![alt text](./img/image-9.png)
+        ![alt text](./img/lab42_creacion_grupo_seguridad.png)
     
     - Para `web-securitygroup` crea Reglas de salida para HTTP y HTTPS
 
-        ![alt text](./img/image-10.png)
+        ![alt text](./img/lab42_reglas_web.png)
 
     - Y para `ssh-seguritygroup` crea Reglas de salida para SSH
 
-        ![alt text](./img/image-11.png)
+        ![alt text](./img/lab42_reglas_ssh.png)
 
 1. **Crea dos nuevas instancias con las siguientes características:**
 
@@ -210,21 +210,21 @@ Al finalizar este laboratorio, el estudiante será capaz de:
     - **Imágenes de aplicaciones y sistemas operativos**
         
         - Selecciona *Inicio rápido* y selecciona **Ubuntu 24.04**.
-            ![alt text](image.png)
+            ![alt text](./img/lab42_imagenes_aws.png)
 
     - **Tipo de instancia:** `t3.micro` o `t2.micro`. Uno apto para la capa gratuita.
 
-        ![alt text](./img/image-1.png)
+        ![Plantillas EC2](./img/lab42_plantilla_ec2.png)
 
     - **Par de claves (inicio de sesión):** Continuar sin un par de claves
 
-        ![alt text](./img/image-2.png)
+        ![Sin par de claves](./img/lab42_sin_par_claves.png)
 
     - **Configuraciones de red:** 
 
         - Seleccionar **Seleccionar un grupo de seguridad existente** y selecciona las los grupos de seguridad `web-securitygroup`, `ssh-seguritygroup` y `default`.
 
-            ![alt text](./img/image-12.png)
+            ![alt text](./img/lab42_configuracion_red.png)
 
             > Debes hacer lo mismo para la segunda instancia.
 
@@ -249,7 +249,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - **Configuración básica**
 
-        ![alt text](./img/image-4.png)
+        ![EC2 - Configuración básica](./img/lab42_ec2_configuracion_basica.png)
 
         - **Nombre del balanceador de carga:** `alb-servers-demo`
 
@@ -271,24 +271,19 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
             - **Paso 1: Create target group:** Selecciona **Instancias** como tipo de destino, escribe el nombre del grupo, mantiene los valores por defecto y haz clic en **Siguiente**.
 
-                ![alt text](./img/image-5.png)
+                ![alt text](./img/lab42_configuracion_grupo_destino.png)
 
             - **Paso 2: Registrar destinos:** Selecciona las instancias `alb-server-1` y `alb-server-2` e incluyelas como destino. Y para finalizar haz clic en **Crear un grupo de destino**.
 
-                ![alt text](./img/image-6.png)
+                ![alt text](./img/lab42_registro_destinos.png)
 
         - Selecciona el grupo de destino creado.
 
-            ![alt text](./img/image-7.png)
+            ![alt text](./img/lab42_seleccion_grupo_destino.png)
 
     - Deja las opciones por defecto y haz clic en **Crear balanceador de carga**.
 
 ### Ejercicio 3.3: Implementación de un Escalado Horizontal (ASG y ELB)
-
-
-### 4. Práctica Individual 💻
-
-El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento elástico y probar su funcionamiento con alta disponibilidad.
 
 1. **Crear la instancia RDS MySQL:**
 
@@ -302,19 +297,49 @@ El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento 
 
     - En **Plantillas** seleccione **Capa gratuita**.
 
-        ![alt text](image.png)
+        ![Plantillas RDS](./img/lab42_plantillas_rds.png)
 
-    - En **Configuración** identifica el nombre de la instancia como `db-api-crud-demo`, el **Nombre de usuario maestro** como `admin`, la **Administración de credenciales** como `Autoadministrado` e introduce la contraseña.
+    - En **Disponibilidad y durabilidad** mantiene la opción seleccionada **Implementación de una instancia de base de datos de zona de disponibilidad única (1 instancia)**.
 
-    - En **Configuración de la instancia** selecciona una clase de instancia que esté bajo la **capa gratuita**.
+    - Dentro de **Configuración**:
+    
+        - En **Identificador de instancias de bases de datos** coloca el nombre de la instancia como `db-api-crud-demo`.
+        
+        - Dentro de **Configuración de credenciales**:
+        
+            - El **Nombre de usuario maestro** debe ser `admin`.
+            
+            - La **Administración de credenciales** como `Autoadministrado`.
+            
+            - Y por último introduce la contraseña.
 
-        ![alt text](image-1.png)
+    - En **Configuración de la instancia** mantiene las opciones por defecto.
 
     - En **Almacenamiento** deja los valores por defecto.
 
-    - En **Conectividad** deja los valores por defecto a excepción de **Grupo de seguridad de VPC (firewall)**, donde debes crear dos nuevos grupos  grupo con el nombre `db-api-crud-rds-securitygroup` y selecciona una zona de disponibilidad (us-east-1a). 
+    - Dentro de **Conectividad**:
+    
+        - En **Recurso de computación** selecciona **No se conecte a un recurso informático EC2**.
 
-        ![alt text](image-3.png)
+        - En **Nube privada virtual (VPC)** deja los valores por defecto.
+
+        - En **Grupo de subredes de la base de datos** deja los valores por defecto.
+
+        - En **Acceso público** selecciona **No**.
+
+        - En **Grupo de seguridad de VPC (firewall)** selecciona **Elegir existente**.
+
+        - En **Grupos de seguridad de VPC existentes** selecciona **default**.
+
+        - En **Zona de disponibilidad** selecciona **Sin preferencia**.
+
+        - Y por último, en **Proxy de RDS** y **Entidad de certificación** deja los valores por defecto.
+
+    - En **Autenticación de bases de datos** selecciona **Autenticación con contraseña**.
+
+    - En **Supervisión** deja los valores por defecto.
+
+    - En **Configuración adicional** deja los valores por defecto.
 
 2. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento**, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1 o del punto anterior.
 
@@ -424,3 +449,8 @@ El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento 
     - Realiza pruebas de estrés en el procesador y/o a través de peticiones para verificar el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.
 
 El resultado final es una aplicación **elástica y segura**, probada y accesible a través de un dominio con **HTTPS**. La evidencia debe incluir capturas de pantalla de la **colección de Postman** y el panel del **ASG** con 3 instancias funcionando.
+
+
+### 4. Práctica Individual 💻
+
+El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento elástico y probar su funcionamiento con alta disponibilidad.
