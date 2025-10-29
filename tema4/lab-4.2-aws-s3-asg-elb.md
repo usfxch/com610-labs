@@ -285,7 +285,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 ### Ejercicio 3.3: Implementación de un Escalado Horizontal (ASG y ELB)
 
-1. **Integración de la API:** Despliega el código de la **API CRUD** como **Plantilla de Lanzamiento**, asegurando que se conecte a la instancia de **Amazon RDS** del Laboratorio 4.1 o del punto anterior.
+1. **Crea una instancia EC2 para preparar la Plantilla de lanzamiento**
 
     - Lanza una nueva instancia **Amazon EC2** dentro de la **capa gratuita** y asegurate que en **Configuraciones de red** se seleccionen los grupos de seguridad para Web (HTTP y HTTPS), acceso remoto (SSH) y crea un grupo de seguridad para conectarse a la instancia RDS de MySQL.
 
@@ -300,7 +300,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
         - Instalar **MySQL Client** para probar la conexión con el RDS.
 
             ```bash
-            sudo apt install mysql
+            sudo apt install mysql-client
             ```
 
         - Instalar Node.js (instrucciones de [Web oficial de Node.js] (https://nodejs.org/es/download)):
@@ -351,23 +351,6 @@ Al finalizar este laboratorio, el estudiante será capaz de:
                 ```
                 > Debería mostrar por ejemplo: "6.0.13"
 
-        - Prueba la conexión desde la instancia EC2 hacia el RDS utilizando **MySQL Client**.
-
-            ```bash
-            mysql -U admin -h endpoint-del-rds -p
-            ```
-            > Deberías conectarte sin ningún problema.
-
-        - Clona el proyecto API CRUD Movies
-
-            ```bash
-            git clone https://github.com/marceloquispeortega/api-restful-crud-movies
-            ```
-
-        - Configura el archivo .env con los datos de acceso y configura el PM2 para configurarlo desde el arranque.
-
-        - Crea la Plantilla de lanzamiento a partir de esta instancia.
-
 2. **Crear la instancia RDS MySQL:**
 
     Crea una instancia de base de datos MySQL en **Amazon RDS**, configurando los detalles como el motor, la clase de instancia, las credenciales y los grupos de seguridad. Sigue los siguientes pasos:
@@ -404,7 +387,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
     
         - En **Recurso de computación** selecciona **Conectarse a un recurso informático de EC2** y selecciona la instancia EC2 que creaste en el ejercicio anterior.
 
-            ![Conectividad con la instancia EC2](lab42_conectividad_ec2_rds.png)
+            ![Conectividad con la instancia EC2](./img/lab42_conectividad_ec2_rds.png)
 
         - En **Nube privada virtual (VPC)** deja los valores por defecto.
 
@@ -426,33 +409,185 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - En **Configuración adicional** deja los valores por defecto.
 
+3. **Prueba la conexión de la instancia EC2 con la instancia RDS y despliegue del API CRUD**
 
-2. **Configuración del ASG para que sea escalable:**
+    - Ingresa a la instancia EC2 y conectate a la instancia RDS utilizando **MySQL Client**.
 
-    - Configura el ASG con 1 instancia como mínimo, 2 instancias deseadas y 4 como máximo.
+        ```bash
+        mysql -U admin -h endpoint-del-rds -p
+        ```
+        > Deberías conectarte sin ningún problema.
 
-    <!-- - Realiza pruebas de estrés en el procesador y con peticiones tipo GET.  -->
+    - Ya dentro del CLI de MySQL, crea una base de datos con el nombre `db_apimovies` y un usuario con privilegios para esa base de datos.
 
-    <!-- - Verifica en base a las pruebas de estrés el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.  -->
+        ```mysql
+        CREATE DATABASE db_apimovies;
+        ```
 
-    <!-- - Después de las pruebas de estrés verifica que las instancias ya no utilizadas se vuelvan a apagar y retornen a su estado inicial. -->
+        ```mysql
+        CREATE USER 'usr_movies'@'172.31.20.150' IDENTIFIED BY 'secret';
+        ```
+
+        ```mysql
+        GRANT ALL PRIVILEGES ON db_apimovies.* TO 'usr_movies'@'172.31.20.150';
+        ```
+
+        ```mysql
+        FLUSH PRIVILEGES;
+        ```
+
+        > `172.31.20.150` es la IP que deberás cambiar por la IP privada de tu instancia.
+
+    - Clona el proyecto API CRUD Movies
+
+        ```bash
+        git clone https://github.com/marceloquispeortega/api-restful-crud-movies-nestjs
+        ```
+
+    - Configura el archivo `.env` con los datos de acceso modificando los valores de conexión de las variables `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` y `DB_NAME`.
+
+    - Genera el "build" del proyecto
+
+        ```bash
+        npm run build
+        ```
+
+    - Configura el PM2 para configurarlo desde el arranque
+
+        ```bash
+        pm2 start dist/main.js --name api -i 2
+        ```
+
+        ```bash
+        pm2 save
+        ```
+
+        ```bash
+        pm2 startup
+        ```
+
+        > Para completar se debe ejecutar el comando que sugiere el resultado de `pm2 startup`.
+
+    - Instala `nginx` y configura el virtual host por defecto para habilitar el proxy inverso a la API CRUD.
+
+        ```nginx
+        server {
+            listen 80 default_server; 
+            listen [::]:80 default_server;
+
+            server_name _;
+
+            location / {
+                proxy_pass http://127.0.0.1:3000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+        }
+        ```
+
+    - Crea la **Plantilla de lanzamiento** a partir de esta instancia
+
+        - Ingresa a la instancia, a la derecha, haz clic en **Acciones**, luego **Imagen y Plantillas** y por último en **Crear plantilla a partir de una instancia**.
+
+            ![alt text](./img/image-3.png)
+
+        - Coloca un nombre y descripción en **Nombre y descripción de la plantilla de lanzamiento**
+
+            ![alt text](./img/image.png)
+
+        - En **Imágenes de aplicaciones y sistemas operativos** deja los valores por defecto.
+
+            ![alt text](./img/image-1.png)
+
+        - En **Tipo de instancia** verifica que el tipo de instancia figure como **Apto para la capa gratuita**.
+
+        - En **Par de claves** selecciona **No incluir en la plantilla de lanzamiento**.
+
+            ![alt text](./img/image-4.png)
+
+        - En **Configuraciones de red** debe tener los mismos grupos de seguridad de la instancia (Web, SSH y RDS).
+
+            ![alt text](./img/image-2.png)
+
+        - En **Almacenamiento** y **Detalle avanzados** mantiene los valores por defecto.
+
+        - Por último, haz clic en **Crear plantilla de lanzamiento**.
+
+4. **Configuración del ASG para que sea escalable:**
+
+    - **Paso 1: Elegir plantilla de lanzamiento**
+
+        - Introduce el nombre del grupo de Auto Scaling
+
+            ![alt text](./img/image-5.png)
+
+        - Selecciona la plantilla de lanzamiento
+
+            ![alt text](./img/image-6.png)
+
+        - Clic en **Siguiente**
+
+    - **Paso 2: Elegir las opciones de lanzamiento de instancias**
+
+        - En **Red** selecciona las zonas de disponibilidad que te permita y en **Distribución de zonas de disponibilidad** selecciona **Mejor esfuerzo equilibrado**.
+
+            ![alt text](./img/image-7.png)
+
+    - **Paso 3: Integrar en otros servicios**
+
+        - En **Balance de carga**, selecciona **Crear nuevo balanceador de carga** del tipo **Application Load Balancer** y con esquema **Internet-facing**.
+
+            ![alt text](./img/image-8.png)
+
+        - En **Zonas de disponibilidad y subredes** deja las por defecto y en **Agentes de escucha y direccionamiento** crea un grupo de destino.
+
+            ![alt text](./img/image-9.png)
+
+        - En **Opciones de integración de VPC Lattice** deja los valores por defecto.
+
+        - En **Cambio de zona del controlador de recuperación de aplicaciones** deja los valores por defecto.
+
+        - En **Comprobaciones de estado** deja los valores por defecto. 
+
+    - **Paso 4: Configurar escalamiento y tamaño de grupo**
+
+        - En **Tamaño del grupo** coloca 1 como **Capacidad deseada**.
+
+            ![alt text](./img/image-10.png)
+
+        - En **Escalado** coloca 1 como **Capacidad deseada mínima** y 4 como **Capacidad deseada máxima**.
+
+            ![alt text](./img/image-11.png)
+
+        - En **Política de mantenimiento de instancia** selecciona **Sin política**.
+
+        - En **Ajustes de capacidad adicionales** y **Configuración adicional** deja los valores por defecto.
+
+    - **Paso 5: Añadir notificación**
+
+        - No hacer ningún cambio y hacer clic en **Siguiente**.
+
+    - **Paso 6: Añadir etiquetas**
+
+        - No agregar nada y hacer clic en **Siguiente**.
+
+    - **Paso 7: Revisar**
+
+        - Revisar la configuración y hacer clic en **Crear grupo de Auto Scaling**. 
 
 
-2. **Prueba de Escalabilidad:**
+5. **Prueba de Escalabilidad:**
 
-    - Accede a la **URL HTTPS** del subdominio para realizar una prueba del endpoint READ.
+    - Escala manualmente el ASG a **3 réplicas (Capacidad deseada)** y espera a que las nuevas instancias se registren en el ELB.
 
-    - Escala manualmente el ASG a **3 réplicas** y espera a que las nuevas instancias se registren en el ELB.
+    - Reduce manualmente el ASG a **1 réplica (Capacidad deseada)** y espera a que las nuevas instancias se eliminen del ELB.
 
-3. **Verificación de Alta Disponibilidad:** 
+6. **Verificación de Alta Disponibilidad:** 
 
     - Utiliza **Postman** (o herramienta similar) para ejecutar **múltiples peticiones (ej., 100)** en bucle contra el endpoint `CREATE` o `UPDATE` de la API a través del subdominio, demostrando que todas las réplicas responden y los datos se persisten correctamente en RDS.
     
     - Realiza pruebas de estrés en el procesador y/o a través de peticiones para verificar el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.
 
 El resultado final es una aplicación **elástica y segura**, probada y accesible a través de un dominio con **HTTPS**. La evidencia debe incluir capturas de pantalla de la **colección de Postman** y el panel del **ASG** con 3 instancias funcionando.
-
-
-### 4. Práctica Individual 💻
-
-El estudiante debe implementar la API CRUD en esta arquitectura de escalamiento elástico y probar su funcionamiento con alta disponibilidad.
