@@ -425,18 +425,18 @@ Al finalizar este laboratorio, el estudiante será capaz de:
         ```
 
         ```mysql
-        CREATE USER 'usr_movies'@'172.31.20.150' IDENTIFIED BY 'secret';
+        CREATE USER 'usr_movies'@'%' IDENTIFIED BY 'secret';
         ```
 
         ```mysql
-        GRANT ALL PRIVILEGES ON db_apimovies.* TO 'usr_movies'@'172.31.20.150';
+        GRANT ALL PRIVILEGES ON db_apimovies.* TO 'usr_movies'@'%';
         ```
 
         ```mysql
         FLUSH PRIVILEGES;
         ```
 
-        > `172.31.20.150` es la IP que deberás cambiar por la IP privada de tu instancia.
+        > Se utiliz `%` para que cualquier IP de la subred se pueda conectar a RDS.
 
     - Clona el proyecto API CRUD Movies
 
@@ -487,29 +487,35 @@ Al finalizar este laboratorio, el estudiante será capaz de:
         }
         ```
 
-    - Crea la **Plantilla de lanzamiento** a partir de esta instancia
+    - Crea la **Imagen** a partir de esta instancia
 
-        - Ingresa a la instancia, a la derecha, haz clic en **Acciones**, luego **Imagen y Plantillas** y por último en **Crear plantilla a partir de una instancia**.
+        - Haz clic sobre el ID de la instancia, luego clic en **Acciones**, en **Imagen y plantillas** y en **Crear imagen**.
 
-            ![alt text](./img/image-3.png)
+            ![Pasos para crear una imagen](./img/lab42_pasos_creacion_imagen.png)
 
-        - Coloca un nombre y descripción en **Nombre y descripción de la plantilla de lanzamiento**
+        - Introduce un nombre para la imagen, mantiene las demás opciones por defecto y haz clic en **Crear imagen**.
 
-            ![alt text](./img/image.png)
+    - Crea la **Plantilla de lanzamiento** a partir de esta imagen
 
-        - En **Imágenes de aplicaciones y sistemas operativos** deja los valores por defecto.
+        - Accede a Plantillas de lanzamiento, coloca un nombre a la plantilla y descripción en **Nombre y descripción de la plantilla de lanzamiento**
 
-            ![alt text](./img/image-1.png)
+            ![alt text](./img/lab42_plantilla_lanzamiento.png)
 
-        - En **Tipo de instancia** verifica que el tipo de instancia figure como **Apto para la capa gratuita**.
+        - En **Imágenes de aplicaciones y sistemas operativos** selecciona **Mis AMI**, luego **De mi propiedad** y selecciona la imagen que creaste en el paso anterior.
+
+            ![Imágenes para la Plantilla de lanzamiento](./img/lab42_imagenes_plantilla_lanzamiento.png)
+
+        - En **Tipo de instancia** selecciona un tipo **Apto para la capa gratuita**.
+
+            ![alt text](./img/lab42_plantilla_tipo_instancia.png)
 
         - En **Par de claves** selecciona **No incluir en la plantilla de lanzamiento**.
 
-            ![alt text](./img/image-4.png)
+            ![alt text](./img/lab42_plantilla_par_claves.png)
 
-        - En **Configuraciones de red** debe tener los mismos grupos de seguridad de la instancia (Web, SSH y RDS).
+        - En **Configuraciones de red** debe tener los mismos grupos de seguridad de la instancia (Web, SSH y **ec2-rds-\*** para conectarse al RDS).
 
-            ![alt text](./img/image-2.png)
+            ![alt text](./img/lab42_plantilla_configuracion_red.png)
 
         - En **Almacenamiento** y **Detalle avanzados** mantiene los valores por defecto.
 
@@ -521,11 +527,11 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - Introduce el nombre del grupo de Auto Scaling
 
-            ![alt text](./img/image-5.png)
+            ![alt text](./img/lab42_auto_scaling_group.png)
 
         - Selecciona la plantilla de lanzamiento
 
-            ![alt text](./img/image-6.png)
+            ![alt text](./img/lab42_asg_plantilla.png)
 
         - Clic en **Siguiente**
 
@@ -533,17 +539,17 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - En **Red** selecciona las zonas de disponibilidad que te permita y en **Distribución de zonas de disponibilidad** selecciona **Mejor esfuerzo equilibrado**.
 
-            ![alt text](./img/image-7.png)
+            ![alt text](./img/lab42_asg_zonas_disponibilidad.png)
 
     - **Paso 3: Integrar en otros servicios**
 
         - En **Balance de carga**, selecciona **Crear nuevo balanceador de carga** del tipo **Application Load Balancer** y con esquema **Internet-facing**.
 
-            ![alt text](./img/image-8.png)
+            ![alt text](./img/lab42_asg_balanceador.png)
 
         - En **Zonas de disponibilidad y subredes** deja las por defecto y en **Agentes de escucha y direccionamiento** crea un grupo de destino.
 
-            ![alt text](./img/image-9.png)
+            ![alt text](./img/lab42_asg_zonas_subredes.png)
 
         - En **Opciones de integración de VPC Lattice** deja los valores por defecto.
 
@@ -555,11 +561,11 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - En **Tamaño del grupo** coloca 1 como **Capacidad deseada**.
 
-            ![alt text](./img/image-10.png)
+            ![alt text](./img/lab42_asg_tamanio.png)
 
         - En **Escalado** coloca 1 como **Capacidad deseada mínima** y 4 como **Capacidad deseada máxima**.
 
-            ![alt text](./img/image-11.png)
+            ![alt text](./img/lab42_asg_escalado.png)
 
         - En **Política de mantenimiento de instancia** selecciona **Sin política**.
 
@@ -577,10 +583,17 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
         - Revisar la configuración y hacer clic en **Crear grupo de Auto Scaling**. 
 
+    - **Crea una política de escalamiento dinámico**
+
+        - Ingresa a **Grupos de Auto Scaling** y selecciona el grupo creado
+
+            ![alt text](./img/lab42_asg_politica.png)
+
+        - Haz clic en **Crear**
 
 5. **Prueba de Escalabilidad:**
 
-    - Escala manualmente el ASG a **3 réplicas (Capacidad deseada)** y espera a que las nuevas instancias se registren en el ELB.
+    - Escala manualmente el ASG a **2 réplicas (Capacidad deseada)** y espera a que las nuevas instancias se registren en el ELB. Verifica si se crearon nuevas instancias de las mismas.
 
     - Reduce manualmente el ASG a **1 réplica (Capacidad deseada)** y espera a que las nuevas instancias se eliminen del ELB.
 
@@ -588,6 +601,26 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - Utiliza **Postman** (o herramienta similar) para ejecutar **múltiples peticiones (ej., 100)** en bucle contra el endpoint `CREATE` o `UPDATE` de la API a través del subdominio, demostrando que todas las réplicas responden y los datos se persisten correctamente en RDS.
     
-    - Realiza pruebas de estrés en el procesador y/o a través de peticiones para verificar el escalamiento hacia arriba cuando el procesador esté estresado o cuando las peticiones alcancen un techo definido.
+    - Realiza pruebas de estrés en el procesador
+    
+        - Instala stress-ng en una instancia y estresa uno de los 2 procesadores de dicha instancia.
 
-El resultado final es una aplicación **elástica y segura**, probada y accesible a través de un dominio con **HTTPS**. La evidencia debe incluir capturas de pantalla de la **colección de Postman** y el panel del **ASG** con 3 instancias funcionando.
+            ```bash
+            sudo apt install stress-ng
+            ```
+
+            ```bash
+            nohup stress-ng -c 1 -t 300s &
+            ```
+
+        - Verifica el estrés del procesador con `htop`
+
+            ```bash
+            htop
+            ```
+
+            ![alt text](./img/lab42_htop.png)
+
+        - Por último, verifica el lanzamiento de las nuevas instancias después de estresar el procesador. Puedes también revisar el **Historial de actividad** del Grupo de Auto Scaling.
+
+El resultado final es una aplicación **elástica y segura**, probada y accesible a través de un dominio y con Swagger habilitado en http://`endpoint-del-ELB`/api. 
