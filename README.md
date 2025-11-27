@@ -28,3 +28,19 @@
 
 - [Laboratorio 4.2: Almacenamiento, Elasticidad y Escalado Automático (S3, ASG y ELB).](tema4/lab-4.2-aws-s3-asg-elb.md)
 
+---
+
+## Proyecto Final
+
+
+### 1. Plantilla de Documentación de Proyecto Final (README.md)
+
+Esta plantilla es ideal para ser el archivo README.md principal en el repositorio de GitHub, sirviendo como la documentación técnica y guía de despliegue.
+
+- [Plantilla 1: Formato de Proyecto en GitHub](https://github.com/usfxch/com610-documentacion-proyecto-final)
+
+### 2. Plantilla de Diapositivas para Presentación
+
+Este formato está diseñado para una presentación ejecutiva y técnica de 5-10 minutos, enfocándose en el "por qué" de las decisiones de diseño.
+
+- [Plantilla 2: Formato de Diapositivas para Presentación Final](proyecto-final/formato-diapositivas.md)
