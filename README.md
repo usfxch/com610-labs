@@ -12,7 +12,7 @@
 
 - [Laboratorio 1.1: Repaso y administración de GNU/Linux (Ubuntu Server)](tema1/lab1.1-repaso-y-administracion-de-gnu-linux-ubuntu-server.md).
 
-- [Laboratorio 1.2: Creación de cuenta en AWS y exploración de la consola de gestión](tema1/lab1.2-creacion-de-cuenta-en-aws-y-exploracion-de-la-consola).
+- [Laboratorio 1.2: Creación de cuenta en AWS y exploración de la consola de gestión](tema1/lab1.2-creacion-de-cuenta-en-aws-y-exploracion-de-la-consola.md).
 
 ## Tema 2: Contenerización de Aplicaciones con Docker
 
