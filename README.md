@@ -16,9 +16,9 @@
 
 ## Tema 2: Contenerización de Aplicaciones con Docker
 
-- Laboratorio 2.1: Creación de una imagen Docker para una aplicación.
+- [Laboratorio 2.1: Creación de una imagen Docker para una aplicación](tema2/lab-2.1-creacion-de-una-imagen-docker-para-una-aplicacion.md).
 
-- Laboratorio 2.2: Gestión de contenedores y volúmenes locales.
+- [Laboratorio 2.2: Gestión de contenedores y volúmenes locales](tema2/lab-2.2-gestion-de-contenedores-y-volumenes-locales.md).
 
 ## Tema 3: Orquestación de Contenedores con Docker Compose
 
