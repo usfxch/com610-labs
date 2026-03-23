@@ -300,44 +300,56 @@ Estos ejercicios te guiarán a través de los conceptos de volúmenes y redes.
 
 ### 4. Práctica Individual 💻
 
-**Objetivo**
+**Despliegue de Arquitectura Multinivel – "Blog Institucional USFX"**
 
-Desplegar una aplicación de múltiples servicios (un CMS de blog y su base de datos) usando volúmenes para la persistencia de datos y una red de Docker para la comunicación.
+**Objetivo:**
+
+Desplegar una arquitectura resiliente de microservicios que separe la lógica de cómputo, el almacenamiento de datos estructurados (SQL) y la persistencia de archivos multimedia, garantizando la comunicación aislada mediante redes virtuales.
 
 **Instrucciones:**
 
-1. **Creación de la Red y el Volumen:**
+1. **Gestión de Infraestructura de Red y Almacenamiento:**
 
-    - Crea una red personalizada de Docker llamada `mi-blog-red`.
+    - Crea una red personalizada de tipo bridge llamada `red-nube-usfx`.
 
-    - Crea un volumen llamado `datos-blog-db`.
+    - **Complejidad de Almacenamiento:** No basta con persistir la base de datos. Debes crear **dos** volúmenes independientes:
 
-2. **Despliegue de la Base de Datos:**
+        - `vol-db-datos`: Para la persistencia de MariaDB.
 
-    - Ejecuta una imagen de base de datos (`mariadb`) en modo `detached`.
+        - `vol-wp-contenido`: Para persistir la carpeta `wp-content` (temas, plugins y fotos subidas).
 
-    - Conéctala a la red `mi-blog-red` y monta el volumen `datos-blog-db`.
+2. **Seguridad y Variables de Entorno (.env):**
 
-    - Configura las variables de entorno necesarias para la base de datos.
+    - **Complejidad de Configuración:** Está estrictamente prohibido pasar contraseñas por la línea de comandos (parámetro `-e`).
 
-3. **Despliegue del Blog (WordPress):**
+    - Crea un archivo llamado `blog.env` en tu directorio de trabajo. Define allí todas las variables necesarias: `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `WORDPRESS_DB_USER`, etc. Deberás invocar este archivo al lanzar tus contenedores.
 
-    - Ejecuta la imagen oficial de WordPress en modo `detached`.
+3. **Despliegue del Nodo de Datos (MariaDB):**
 
-    - Conéctala a la misma red `mi-blog-red`.
+    - Ejecuta el contenedor de MariaDB conectado a `red-nube-usfx`.
 
-    - Asegúrate de que WordPress pueda comunicarse con la base de datos usando el nombre de su contenedor.
+    - Monta el volumen `vol-db-datos` en la ruta correspondiente del motor de base de datos.
 
-    - Mapea el puerto del contenedor de WordPress a un puerto de tu máquina local.
+    - Utiliza el archivo `blog.env` para la configuración.
 
-    - Configura las variables de entorno para la conexión a la base de datos.
+    - **Punto Extra:** Asegúrate de que el contenedor use el character set `utf8mb4` para soportar emojis y caracteres especiales.
 
-4. **Verificación:**
+4. **Despliegue del Nodo de Aplicación (WordPress):**
 
-    - Accede a la instalación de WordPress desde tu navegador y completa la configuración.
+    - Conecta WordPress a la misma red `red-nube-usfx`.
 
-    - Crea una entrada de blog de prueba.
+    - **Complejidad de Persistencia:** Monta el volumen `vol-wp-contenido` en `/var/www/html/wp-content`.
 
-    - Detén y elimina ambos contenedores.
+    - **Ajuste de Rendimiento:** Realiza un bind mount de un archivo local llamado `uploads.ini` hacia el contenedor para aumentar el límite de subida de archivos de PHP a 64MB (investiga la ruta de configuración de PHP en la imagen oficial).
 
-    - Inicia nuevamente solo el contenedor de WordPress (sin eliminar el volumen). ¿Puedes ver la entrada de blog que creaste? **Si lo hiciste correctamente, los datos persistirán.**
+    - Mapea el servicio al puerto local `8081`.
+
+5. **Prueba de Resiliencia y Auditoría:**
+
+    - Accede al blog, instala un tema nuevo y sube una imagen a la biblioteca de medios.
+
+    - **El Desafío de Persistencia:** 1. Detén y elimina ambos contenedores (`docker rm -f`).
+        2. Verifica mediante `docker volume inspect` que los datos siguen existiendo.
+        3. Levanta nuevamente la infraestructura completa apuntando a los mismos volúmenes.
+
+    - **Verificación Final:** Comprueba que el tema instalado y la imagen subida siguen presentes. Si la imagen desapareció, fallaste en la persistencia del sistema de archivos.

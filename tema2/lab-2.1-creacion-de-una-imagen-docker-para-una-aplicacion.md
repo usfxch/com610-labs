@@ -349,17 +349,17 @@ Crear una API REST simple con operaciones CRUD sobre una lista de elementos que 
 
         - Instala Express.js: `npm install express`
 
-        - Escribe el código en `app.js` para crear una API que gestione una lista de, por ejemplo, "autores" (authors).
+        - Escribe el código en `app.js` para crear una API que gestione una lista de, por ejemplo, "categorías" (categories).
 
         - Implementa los siguientes endpoints:
 
-            - `GET /authors`: Para listar todas las tareas.
+            - `GET /categories`: Para listar todas las categorías.
 
-            - `POST /authors`: Para crear una nueva tarea.
+            - `POST /categories`: Para crear una nueva categoría.
 
-            - `PUT /authors/:id`: Para actualizar una tarea existente.
+            - `PUT /categories/:id`: Para actualizar una categoría existente.
 
-            - `DELETE /authors/:id`: Para borrar una tarea.
+            - `DELETE /categories/:id`: Para borrar una categoría.
 
         - La API debe escuchar en el puerto 3000.
 
@@ -367,17 +367,17 @@ Crear una API REST simple con operaciones CRUD sobre una lista de elementos que 
 
         - Instala Flask: `pip install Flask`
 
-        - Escribe el código en `app.py` para crear una API que gestione una lista de, por ejemplo, "libros" (`books`).
+        - Escribe el código en `app.py` para crear una API que gestione una lista de, por ejemplo, "películas" (`movies`).
 
         - Implementa los siguientes endpoints:
 
-            - `GET /books`: Para listar todos los libros.
+            - `GET /movies`: Para listar todas las películas.
 
-            - `POST /books`: Para crear un nuevo libro.
+            - `POST /movies`: Para crear una nuevo película.
 
-            - `PUT /books/<id>`: Para actualizar un libro existente.
+            - `PUT /movies/<id>`: Para actualizar una película existente.
 
-            - `DELETE /books/<id>`: Para borrar un libro.
+            - `DELETE /movies/<id>`: Para borrar una película.
 
         - La API debe escuchar en el puerto 5000.
 
