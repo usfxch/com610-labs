@@ -1,0 +1,24 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    links:
+      - db
+    volumes:
+      - .:/home/app
+  db:
+    image: postgres:16.4
+    ports:
+      - "54321:5432"
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: dbmovies
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+      - pgsql-data:/var/lib/postgresql/data
+
+volumes:
+  pgsql-data:

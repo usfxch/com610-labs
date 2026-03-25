@@ -22,7 +22,7 @@
 
 ## Tema 3: Orquestación de Contenedores con Docker Compose
 
-- Laboratorio 3: Creación de Entornos Multi-Servicio y Persistencia con Docker Compose.
+- [Laboratorio 3: Creación de Entornos Multi-Servicio y Persistencia con Docker Compose](tema3/lab-3-creacion-de-un-entorno-multi-servicio-con-docker-compose.md).
 
 ## Tema 4: Gestión de Servicios de Cómputo, Almacenamiento y Bases de Datos en la Nube
 
