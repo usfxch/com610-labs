@@ -719,14 +719,14 @@ networks:
 
 3. **Levanta todos los servicios:**
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 4. **Espera a que MySQL esté listo (30 segundos aproximadamente)**
 
 5. **Verifica que todos están en ejecución:**
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 6. **Revisa los logs de los servicios** para confirmar que iniciaron sin errores
@@ -734,7 +734,7 @@ networks:
 **Capturas requeridas:**
 - [ ] Contenido del `docker-compose.yml` creado
 - [ ] Contenido del `db/init.sql`
-- [ ] Salida de `docker-compose ps` (todos servicios up)
+- [ ] Salida de `docker compose ps` (todos servicios up)
 - [ ] Logs mostrándose sin errores críticos
 
 ---
@@ -756,7 +756,7 @@ networks:
 
 3. **Verifica en la base de datos** que el nuevo curso se insertó correctamente usando:
    ```bash
-   docker-compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "SELECT * FROM cursos;"
+   docker compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "SELECT * FROM cursos;"
    ```
 
 4. **Realiza 10 peticiones** a `http://localhost/api/cursos` para verificar balanceo de carga
@@ -781,29 +781,29 @@ networks:
 **A realizar:**
 
 1. **Genera un reporte final** que incluya:
-   - Estado de todos los servicios (`docker-compose ps`)
+   - Estado de todos los servicios (`docker compose ps`)
    - Volúmenes creados (`docker volume ls`)
    - Redes creadas (`docker network ls`)
    - Imágenes utilizadas (`docker images`)
 
 2. **Detén los servicios:**
    ```bash
-   docker-compose stop
+   docker compose stop
    ```
 
 3. **Verifica estado después del stop:**
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 4. **Para restaurar los servicios (opcional):**
    ```bash
-   docker-compose start
+   docker compose start
    ```
 
 5. **Para limpiar completamente (después de las pruebas):**
    ```bash
-   docker-compose down -v
+   docker compose down -v
    ```
 
 **Capturas requeridas:**
@@ -819,7 +819,7 @@ Debe incluir:
 
 1. ✅ Screenshot del `docker-compose.yml` creado
 2. ✅ Screenshot del `db/init.sql` con tablas y datos
-3. ✅ Screenshot de `docker-compose ps` (todos servicios up)
+3. ✅ Screenshot de `docker compose ps` (todos servicios up)
 4. ✅ Screenshot de respuesta GET /api/cursos
 5. ✅ Screenshot de POST nuevo curso exitoso
 6. ✅ Screenshot de SELECT en MySQL (4 cursos)
