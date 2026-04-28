@@ -187,17 +187,29 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 ### Ejercicio 3.2: Implementación de un Balanceador de Carga (ALB)
 
-1. **Crear grupo de seguridad para acceso Web (HTTP, HTTPS)**
+1. **Crear grupos de seguridad aislados (ALB e Instancias EC2)**
 
-    - Haz clic sobre Crear grupo de seguridad y crea el grupo `web-securitygroup`. 
+    Para aplicar las mejores prácticas de seguridad, las instancias solo deben recibir tráfico a través del balanceador de carga. Para lograr esto, crearemos dos grupos de seguridad:
 
+    - **Grupo de Seguridad para el Balanceador (`alb-securitygroup`)**
+        - En el panel de EC2, ve a **Grupos de seguridad** y haz clic en **Crear grupo de seguridad**. 
+        - Nómbralo `alb-securitygroup`.
+        - En **Reglas de entrada**, permite **HTTP (80)** y **HTTPS (443)** con origen **0.0.0.0/0** (Anywhere IPv4).
+        - *(Opcional)* Puedes guiarte con las siguientes imágenes de referencia.
+        
         ![Creación del grupo de seguridad](./img/lab42_creacion_grupo_seguridad.png)
-    
-    - Para `web-securitygroup` crea Reglas de entrada para HTTP y HTTPS.
-
         ![Reglas para el acceso por Web](./img/lab42_reglas_web.png)
 
+    - **Grupo de Seguridad para las Instancias (`ec2-web-securitygroup`)**
+        - Crea **otro** grupo de seguridad llamado `ec2-web-securitygroup`.
+        - En **Reglas de entrada**, añade **HTTP (80)**.
+        - En la columna **Origen** (Source), selecciona **Personalizado** (Custom) y empieza a escribir `alb-securitygroup`. AWS te sugerirá el ID del grupo creado en el paso anterior (ej. `sg-0abc...`). Selecciónalo.
+        - *Nota: Esto garantiza que nadie en Internet pueda acceder directamente a las instancias EC2 mediante su IP pública.*
+
+
 2. **Crea dos nuevas instancias con las siguientes características:**
+
+    > **Nota:** Puedes lanzar ambas instancias en un solo paso configurando "Número de instancias" a 2 y luego renombrarlas, o crearlas una por una.
 
     - **Nombre y etiquetas**
 
@@ -205,79 +217,78 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     - **Imágenes de aplicaciones y sistemas operativos**
         
-        - Selecciona *Inicio rápido* y selecciona **Ubuntu 24.04**.
+        - Selecciona *Inicio rápido* y elige **Ubuntu 24.04**.
             ![Imágenes de AWS](./img/lab42_imagenes_aws.png)
 
-    - **Tipo de instancia:** `t3.micro` o `t2.micro`. Uno apto para la capa gratuita.
+    - **Tipo de instancia:** `t3.micro` o `t2.micro` (Apto para la capa gratuita).
 
         ![Plantillas EC2](./img/lab42_plantilla_ec2.png)
 
-    - **Par de claves (inicio de sesión):** Continuar sin un par de claves
+    - **Par de claves (inicio de sesión):** Selecciona **Continuar sin un par de claves**.
 
         ![Sin par de claves](./img/lab42_sin_par_claves.png)
 
     - **Configuraciones de red:** 
 
-        - Seleccionar **Seleccionar un grupo de seguridad existente** y selecciona los grupos de seguridad `web-securitygroup` y `default`.
+        - **IMPORTANTE:** Asegúrate de que la opción **Asignar IP pública automáticamente** esté habilitada (Enable) para que la instancia tenga salida a Internet y pueda instalar Nginx. *(El que tenga IP pública no es un riesgo ahora, porque el Grupo de Seguridad bloquea accesos directos).*
+        - Selecciona **Seleccionar un grupo de seguridad existente** y marca los grupos de seguridad `ec2-web-securitygroup` y `default`.
 
             ![Configuración de red del EC2](./img/lab42_configuracion_red.png)
 
-            > Debes hacer lo mismo para la segunda instancia.
-
-    - **Configurar almacenamiento:** Mantener los valores por defecto
+    - **Configurar almacenamiento:** Mantiene los valores por defecto.
 
     - **Detalles avanzados**
 
-        Dentro de **Datos de usuario** copiar el siguiente código:
+        - Desplázate hasta la parte inferior. Dentro de **Datos de usuario** copia el siguiente código:
 
-        ```
+        ```bash
         #!/bin/bash
         apt update -y
         apt install -y nginx
         systemctl start nginx
         systemctl enable nginx
-        echo "<h1>Hola Mundo Server - $(hostname -f) con Nginx</h1>" > /var/www/html/index.nginx-debian.html
+        rm -f /var/www/html/index.nginx-debian.html
+        echo "<h1>Hola Mundo Server - $(hostname -f) con Nginx</h1>" > /var/www/html/index.html
         ```
 
 3. Configura un Balanceador de carga de tipo **ALB** (**Application Load Balancer**).
 
-    Haz clic en **Crear balanceador de carga** y luego selecciona **Balanceador de carga de aplicaciones**.
+    - Ve a **Balanceadores de carga** y haz clic en **Crear balanceador de carga**. Selecciona **Balanceador de carga de aplicaciones**.
 
     - **Configuración básica**
 
         ![EC2 - Configuración básica](./img/lab42_ec2_configuracion_basica.png)
 
         - **Nombre del balanceador de carga:** `alb-servers-demo`
-
-        - **Esquema:** Selecciona **Expuesto a Internet**
-
+        - **Esquema:** Selecciona **Expuesto a Internet** (Internet-facing)
         - **Tipo de dirección IP del equilibrador de carga:** Selecciona **IPv4**
 
     - **Mapeo de red**
 
         - **VPC:** Mantiene el por defecto.
+        - **Zonas de disponibilidad y subredes:** Marca **al menos dos** (o directamente todas) las zonas de disponibilidad disponibles.
 
-        - **Zonas de disponibilidad y subredes:** Marca todas las zonas de disponibilidad.
-
-    - **Grupos de seguridad:** Selecciona los grupos de seguridad `web-securitygroup` y `default`.
+    - **Grupos de seguridad:** Elimina el grupo que aparezca por defecto (si lo hay) y selecciona **únicamente** `alb-securitygroup`.
 
     - **Agentes de escucha y direccionamiento**
 
-        - Haz clic sobre **Cree un grupo de destino** 
+        - Haz clic sobre el botón **Cree un grupo de destino** (esto abrirá una nueva pestaña del navegador).
 
-            - **Paso 1: Create target group:** Selecciona **Instancias** como tipo de destino, escribe el nombre del grupo, mantiene los valores por defecto y haz clic en **Siguiente**.
+            - **Paso 1: Create target group:** Selecciona **Instancias** como tipo de destino, escribe el nombre del grupo (por ejemplo `alb-target-group`), el puerto debe ser **80 (HTTP)**, mantiene los demás valores por defecto y haz clic en **Siguiente**.
 
                 ![Configuración del grupo de destino](./img/lab42_configuracion_grupo_destino.png)
 
-            - **Paso 2: Registrar destinos:** Selecciona las instancias `alb-server-1` y `alb-server-2` e incluyelas como destino. Y para finalizar haz clic en **Crear un grupo de destino**.
+            - **Paso 2: Registrar destinos:** Selecciona las instancias `alb-server-1` y `alb-server-2`. Luego, **es fundamental** que hagas clic en el botón **"Incluir como pendientes a continuación"** (Include as pending below). Una vez que aparezcan en la lista inferior, haz clic en **Crear grupo de destino**.
 
                 ![Registro de instancias al grupo de destino](./img/lab42_registro_destinos.png)
 
-        - Selecciona el grupo de destino creado.
+        - Regresa a la pestaña original de la creación del Balanceador de Carga.
+        - Haz clic en el ícono de **Actualizar (🔄)** al lado de la lista desplegable y selecciona el grupo de destino recién creado.
 
             ![Selección del grupo de destino](./img/lab42_seleccion_grupo_destino.png)
 
-    - Deja las opciones por defecto y haz clic en **Crear balanceador de carga**.
+    - Deja las opciones por defecto y haz clic al final en **Crear balanceador de carga**.
+
 
 ### Ejercicio 3.3: Implementación de un Escalado Horizontal (ASG y ELB)
 
