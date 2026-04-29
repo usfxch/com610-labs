@@ -195,16 +195,16 @@ Al finalizar este laboratorio, el estudiante será capaz de:
         - En el panel de EC2, ve a **Grupos de seguridad** y haz clic en **Crear grupo de seguridad**. 
         - Nómbralo `alb-securitygroup`.
         - En **Reglas de entrada**, permite **HTTP (80)** y **HTTPS (443)** con origen **0.0.0.0/0** (Anywhere IPv4).
-        - *(Opcional)* Puedes guiarte con las siguientes imágenes de referencia.
         
-        ![Creación del grupo de seguridad](./img/lab42_creacion_grupo_seguridad.png)
-        ![Reglas para el acceso por Web](./img/lab42_reglas_web.png)
+        ![Creación del grupo de seguridad para ALB](./img/lab42_alb_secuity_group.png)
 
     - **Grupo de Seguridad para las Instancias (`ec2-web-securitygroup`)**
         - Crea **otro** grupo de seguridad llamado `ec2-web-securitygroup`.
         - En **Reglas de entrada**, añade **HTTP (80)**.
         - En la columna **Origen** (Source), selecciona **Personalizado** (Custom) y empieza a escribir `alb-securitygroup`. AWS te sugerirá el ID del grupo creado en el paso anterior (ej. `sg-0abc...`). Selecciónalo.
         - *Nota: Esto garantiza que nadie en Internet pueda acceder directamente a las instancias EC2 mediante su IP pública.*
+
+        ![Creación del grupo de seguridad para EC2](./img/lab42_ec2_web_security_group.png)
 
 
 2. **Crea dos nuevas instancias con las siguientes características:**
