@@ -49,6 +49,8 @@ Al finalizar este laboratorio, el estudiante será capaz de:
     ```
 
     > **Nota:** El build multi-stage reduce drásticamente el tamaño de la imagen final porque solo copia los artefactos necesarios, descartando herramientas de compilación intermedias.
+    > 
+    > **Importante:** Asegúrate de que tu aplicación exponga un endpoint `/health` que retorne HTTP 200. Este endpoint será utilizado en el siguiente ejercicio para validar que el contenedor nuevo está sano antes de exponerlo al tráfico público.
 
 3. Crea un archivo `.dockerignore` en la raíz para evitar copiar archivos innecesarios al contexto de build:
 
@@ -166,18 +168,49 @@ Al finalizar este laboratorio, el estudiante será capaz de:
               username: ${{ secrets.SSH_USER }}
               key: ${{ secrets.SSH_PRIVATE_KEY }}
               script: |
-                docker pull ${{ secrets.DOCKER_USERNAME }}/mi-app:latest
-                docker stop mi-app || true
-                docker rm mi-app || true
+                IMAGE="${{ secrets.DOCKER_USERNAME }}/mi-app:latest"
+                
+                # 1. Desplegar la nueva imagen en un puerto alterno (3001) para validación
+                docker pull $IMAGE
                 docker run -d \
-                  --name mi-app \
+                  --name mi-app-new \
                   --restart unless-stopped \
-                  -p 80:3000 \
-                  ${{ secrets.DOCKER_USERNAME }}/mi-app:latest
+                  -p 3001:3000 \
+                  $IMAGE
+                
+                # 2. Esperar a que el contenedor inicialice
+                sleep 5
+                
+                # 3. Health check: validar que el nuevo contenedor responde correctamente
+                if curl -sf http://localhost:3001/health; then
+                  echo "Health check exitoso. Activando nuevo contenedor..."
+                  
+                  # 4. Detener y eliminar el contenedor viejo (si existe)
+                  docker stop mi-app || true
+                  docker rm mi-app || true
+                  
+                  # 5. Exponer el nuevo contenedor en el puerto público 80
+                  docker run -d \
+                    --name mi-app \
+                    --restart unless-stopped \
+                    -p 80:3000 \
+                    $IMAGE
+                  
+                  # 6. Limpiar el contenedor de validación
+                  docker rm -f mi-app-new || true
+                else
+                  echo "Health check FALLIDO. Cancelando despliegue y manteniendo versión anterior."
+                  docker rm -f mi-app-new || true
+                  exit 1
+                fi
+                
+                # 7. Limpieza de imágenes y contenedores huérfanos
                 docker system prune -f
     ```
 
     > **Nota:** El job `deploy` usa `needs: build-and-push` para garantizar que solo se ejecute si el build y el push fueron exitosos.
+    > 
+    > **¿Por qué el health check es importante?** El script de despliegue no reemplaza el contenedor activo hasta verificar que el nuevo está sano. Si la nueva imagen tiene un error crítico (por ejemplo, no arranca, falla la conexión a la base de datos o retorna 500 en `/health`), el script cancela el deploy y mantiene la versión anterior funcionando en el puerto 80. Esto evita que los usuarios vean una aplicación caída.
 
 2. Realiza commit y push del workflow:
 
@@ -228,7 +261,9 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
     ![Cambio reflejado en el despliegue](./img/lab52_cambio_desplegado.png)
 
-5. **Rollback manual:** Imagina que el cambio recién desplegado tiene un error crítico. Como etiquetamos la imagen con el `github.sha`, puedes volver a una versión anterior sin necesidad de reconstruirla. Explica en tu informe cómo realizarías el rollback ejecutando los siguientes comandos directamente en el servidor remoto:
+5. **Simulación de fallo de health check:** Imagina que introduces un error que hace que tu aplicación no responda en `/health`. Por ejemplo, cambia el puerto interno del `server.js` a uno diferente o comenta el endpoint `/health`. Haz commit y push. Observa que el workflow de GitHub Actions fallará en el job `deploy` ❌, pero la aplicación anterior seguirá funcionando en el puerto 80 porque el script nunca llegó a reemplazar el contenedor activo. Corrige el error y vuelve a desplegar.
+
+6. **Rollback manual:** Si por alguna razón necesitas revertir a una versión anterior (por ejemplo, descubres un bug después de que pasó el health check), puedes hacerlo fácilmente porque etiquetamos la imagen con el `github.sha`. Explica en tu informe cómo realizarías el rollback ejecutando los siguientes comandos directamente en el servidor remoto:
 
     ```bash
     # Reemplaza SHA_ANTERIOR por el SHA del commit anterior
@@ -238,7 +273,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
     docker run -d --name mi-app --restart unless-stopped -p 80:3000 TU_USUARIO/mi-app:SHA_ANTERIOR
     ```
 
-    > **Reflexión:** El etiquetado con el SHA del commit permite identificar exactamente qué versión del código está corriendo en cada imagen, facilitando los rollbacks y la trazabilidad.
+    > **Reflexión:** El health check previene despliegues rotos, pero el etiquetado con SHA del commit te da la capacidad de revertir rápidamente si descubres un problema posterior. Ambas estrategias combinadas hacen tu pipeline mucho más seguro.
 
 ## 4. Práctica Individual 💻
 
