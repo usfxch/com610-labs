@@ -33,3 +33,5 @@
 ## Tema 5: Automatización de Despliegues (CI/CD)
 
 - [Laboratorio 5.1: Creación de un flujo de GitHub Actions para CI](tema5/lab-5.1-creacion-de-un-workflow-de-github-actions-para-ci.md).
+
+- [Laboratorio 5.2: Configuración de un pipeline de despliegue continuo](tema5/lab-5.2-configuracion-de-un-pipeline-de-despliegue-continuo.md).
