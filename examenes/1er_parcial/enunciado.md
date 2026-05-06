@@ -80,6 +80,22 @@ Eres administrador de sistemas en una institución educativa. Se te ha encomenda
 - [ ] Salida de creación de usuarios
 - [ ] Resultado de `groups prof_matematica`
 
+**Comandos esperados:**
+```bash
+sudo groupadd -g 2000 docentes
+sudo groupadd -g 3000 estudiantes
+sudo groupadd -g 4000 administradores
+sudo useradd -m -s /bin/bash -c "Profesor de Matemática" -g docentes prof_matematica
+sudo useradd -m -s /bin/bash -c "Profesor de Lenguaje" -g docentes prof_lenguaje
+sudo useradd -m -s /bin/bash -c "Administrador LMS" -g administradores -G sudo admin_lms
+# Agregar a prof_matematica al grupo administradores
+sudo usermod -aG administradores prof_matematica
+# Ver estructura
+cat /etc/group | grep -E "docentes|estudiantes|administradores"
+cat /etc/passwd | grep -E "prof_|admin_"
+groups prof_matematica
+```
+
 ---
 
 #### **Parte 2: Estructura de Directorios y Permisos (8 minutos)**
@@ -112,6 +128,39 @@ Tu empresa necesita una estructura para almacenar contenido educativo siguiendo 
 - [ ] Permisos correctos en todos los directorios
 - [ ] Intento fallido de acceso no autorizado
 
+**Comandos esperados:**
+```bash
+sudo mkdir -p /srv/lms/contenidos/{matematica,lenguaje,recursos}
+sudo mkdir -p /srv/lms/usuarios/{docentes,estudiantes}
+sudo mkdir /srv/lms/backup
+
+# Permisos y propietarios base
+sudo chown root:administradores /srv/lms
+sudo chmod 755 /srv/lms
+
+sudo chgrp docentes /srv/lms/contenidos
+sudo chmod 755 /srv/lms/contenidos
+
+sudo chmod 770 /srv/lms/contenidos/matematica
+sudo chmod 770 /srv/lms/contenidos/lenguaje
+sudo chmod 755 /srv/lms/contenidos/recursos
+
+sudo chown root:administradores /srv/lms/usuarios /srv/lms/backup
+sudo chmod 700 /srv/lms/usuarios
+sudo chmod 700 /srv/lms/backup
+
+# Archivos de prueba
+sudo touch /srv/lms/contenidos/matematica/syllabus.txt
+sudo touch /srv/lms/contenidos/lenguaje/syllabus.txt
+sudo touch /srv/lms/contenidos/recursos/publico.txt
+
+# Verificación
+ls -laR /srv/lms
+su - prof_matematica -c "cd /srv/lms/contenidos/matematica; touch prueba.txt"
+su - prof_lenguaje -c "cd /srv/lms/contenidos/lenguaje; touch prueba.txt"
+su - prof_matematica -c "ls /srv/lms/usuarios" # Debe dar Permiso denegado
+```
+
 ---
 
 #### **Parte 3: Servicios Críticos (8 minutos)**
@@ -140,6 +189,16 @@ Un servidor educativo necesita dos servicios críticos para funcionar: SSH para 
 - [ ] Estado de SSH (activo)
 - [ ] Estado de Nginx (activo)
 - [ ] Puertos 22 y 80 abiertos
+
+**Comandos esperados:**
+```bash
+sudo apt update && sudo apt install -y openssh-server nginx
+sudo systemctl enable ssh nginx
+sudo systemctl start ssh nginx
+sudo systemctl status ssh
+sudo systemctl status nginx
+sudo ss -tulpn | grep -E ":22|:80"
+```
 
 ---
 
@@ -186,6 +245,17 @@ Confirma que ambas tareas están programadas correctamente usando `sudo crontab 
 **Capturas requeridas:**
 - [ ] Script creado y ejecutado correctamente
 - [ ] Salida de `sudo crontab -l` mostrando ambas tareas programadas
+
+**Comandos esperados:**
+```bash
+sudo /usr/local/bin/limpiar_logs.sh
+sudo crontab -e
+# Agregar las lineas:
+# 0 3 * * 0 /usr/local/bin/limpiar_logs.sh
+# 0 13 * * 5 tar -czf /srv/lms/backup/lms_backup_$(date +\%F).tar.gz /srv/lms/
+
+sudo crontab -l
+```
 
 **Referencia de sintaxis cron:**
 ```
@@ -407,6 +477,28 @@ Una consultora de tecnología te ha contratado para containerizar su aplicación
 - [ ] Contenido de `Dockerfile` creado
 - [ ] Salida de `docker images` mostrando api-lms:1.0
 
+**Comandos esperados:**
+```bash
+# Modificar package.json para agregar:
+# "scripts": { "start": "node server.js", "dev": "nodemon server.js" }
+
+# Crear y editar Dockerfile:
+# FROM node:18-alpine AS base
+# WORKDIR /app
+# COPY package*.json ./
+# FROM base AS builder
+# RUN npm install
+# FROM base AS production
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY . .
+# RUN mkdir -p /app/data
+# EXPOSE 3000
+# CMD ["node", "server.js"]
+
+docker build -t api-lms:1.0 .
+docker images | grep api-lms
+```
+
 ---
 
 #### **Parte 2: Volúmenes y Persistencia (10 minutos)**
@@ -465,6 +557,19 @@ Una consultora de tecnología te ha contratado para containerizar su aplicación
 - [ ] Primer contenedor corriendo y respondiendo API
 - [ ] Respuesta GET /api/cursos con datos persistidos
 - [ ] Nuevo contenedor accediendo a los datos del volumen
+
+**Comandos esperados:**
+```bash
+docker volume create datos-lms
+docker run -d --name api-lms-prod -p 3000:3000 -v datos-lms:/app/data api-lms:1.0
+docker ps && docker logs api-lms-prod
+curl http://localhost:3000/api/cursos
+curl -X POST http://localhost:3000/api/cursos -H "Content-Type: application/json" -d '{"nombre":"Física","profesor":"Prof. Martínez","estudiantes":30}'
+docker stop api-lms-prod && docker rm api-lms-prod
+docker run -d --name api-lms-recuperado -p 3001:3000 -v datos-lms:/app/data api-lms:1.0
+sleep 5
+curl http://localhost:3001/api/cursos
+```
 
 ---
 
@@ -532,6 +637,21 @@ Una consultora de tecnología te ha contratado para containerizar su aplicación
 - [ ] Respuestas de balanceador (múltiples requests)
 - [ ] Nginx corriendo como balanceador
 
+**Comandos esperados:**
+```bash
+docker network create red-lms
+docker stop api-lms-recuperado && docker rm api-lms-recuperado
+docker run -d --name api-lms-1 --network red-lms -v datos-lms:/app/data api-lms:1.0
+docker run -d --name api-lms-2 --network red-lms -v datos-lms:/app/data api-lms:1.0
+docker run -d --name api-lms-3 --network red-lms -v datos-lms:/app/data api-lms:1.0
+docker exec api-lms-1 curl -s http://api-lms-2:3000/api/cursos
+docker exec api-lms-1 curl -s http://api-lms-3:3000/api/cursos
+
+# Crear nginx.conf (ver especificaciones)
+docker run -d --name balanceador-lms --network red-lms -p 8080:80 -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro nginx
+for i in {1..10}; do curl http://localhost:8080/api/cursos; done
+```
+
 ---
 
 #### **Parte 4: Hot Reload para Desarrollo (4 minutos)**
@@ -576,6 +696,17 @@ Una consultora de tecnología te ha contratado para containerizar su aplicación
 **Capturas requeridas:**
 - [ ] Contenedor de desarrollo en ejecución
 - [ ] Prueba de hot reload (cambio en código + nueva ruta funciona)
+
+**Comandos esperados:**
+```bash
+# Crear Dockerfile.dev (ver especificaciones)
+docker build -t api-lms:dev -f Dockerfile.dev .
+docker run -d --name api-lms-dev -p 8888:3000 -v $(pwd):/app -v /app/node_modules api-lms:dev
+curl http://localhost:8888/api/cursos
+
+# Modificar server.js
+curl http://localhost:8888/status
+```
 
 ---
 
@@ -719,14 +850,14 @@ networks:
 
 3. **Levanta todos los servicios:**
    ```bash
-   docker compose up -d
+   docker-compose up -d
    ```
 
 4. **Espera a que MySQL esté listo (30 segundos aproximadamente)**
 
 5. **Verifica que todos están en ejecución:**
    ```bash
-   docker compose ps
+   docker-compose ps
    ```
 
 6. **Revisa los logs de los servicios** para confirmar que iniciaron sin errores
@@ -734,8 +865,20 @@ networks:
 **Capturas requeridas:**
 - [ ] Contenido del `docker-compose.yml` creado
 - [ ] Contenido del `db/init.sql`
-- [ ] Salida de `docker compose ps` (todos servicios up)
+- [ ] Salida de `docker-compose ps` (todos servicios up)
 - [ ] Logs mostrándose sin errores críticos
+
+**Comandos esperados (Partes 1 y 2):**
+```bash
+mkdir -p ~/lms-platform/{app,nginx,db}
+cd ~/lms-platform
+cp ~/proyecto-docker/app/package.json ~/proyecto-docker/app/server.js ~/proyecto-docker/app/Dockerfile app/
+
+# Crear .env, nginx/nginx.conf, db/init.sql y docker-compose.yml con las especificaciones.
+docker-compose up -d
+docker-compose ps
+docker-compose logs
+```
 
 ---
 
@@ -756,7 +899,7 @@ networks:
 
 3. **Verifica en la base de datos** que el nuevo curso se insertó correctamente usando:
    ```bash
-   docker compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "SELECT * FROM cursos;"
+   docker-compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "SELECT * FROM cursos;"
    ```
 
 4. **Realiza 10 peticiones** a `http://localhost/api/cursos` para verificar balanceo de carga
@@ -772,6 +915,15 @@ networks:
 - [ ] Múltiples requests distribuidos en balanceador
 - [ ] Volúmenes creados y con datos
 
+**Comandos esperados:**
+```bash
+curl http://localhost/api/cursos
+curl -X POST http://localhost/api/cursos -H "Content-Type: application/json" -d '{"nombre":"Física","profesor":"Prof. Pérez","estudiantes":20,"descripcion":"Mecánica"}'
+source .env && docker-compose exec db mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} -e "SELECT * FROM cursos;"
+for i in {1..10}; do curl http://localhost/api/cursos; done
+docker-compose logs api1 api2 api3
+```
+
 ---
 
 #### **Parte 4: Limpieza y Finalización (6 minutos)**
@@ -781,35 +933,47 @@ networks:
 **A realizar:**
 
 1. **Genera un reporte final** que incluya:
-   - Estado de todos los servicios (`docker compose ps`)
+   - Estado de todos los servicios (`docker-compose ps`)
    - Volúmenes creados (`docker volume ls`)
    - Redes creadas (`docker network ls`)
    - Imágenes utilizadas (`docker images`)
 
 2. **Detén los servicios:**
    ```bash
-   docker compose stop
+   docker-compose stop
    ```
 
 3. **Verifica estado después del stop:**
    ```bash
-   docker compose ps
+   docker-compose ps
    ```
 
 4. **Para restaurar los servicios (opcional):**
    ```bash
-   docker compose start
+   docker-compose start
    ```
 
 5. **Para limpiar completamente (después de las pruebas):**
    ```bash
-   docker compose down -v
+   docker-compose down -v
    ```
 
 **Capturas requeridas:**
 - [ ] Reporte final con estado de servicios
 - [ ] Confirmación de stop
 - [ ] Comandos documentados para restaurar
+
+**Comandos esperados:**
+```bash
+docker-compose ps
+docker volume ls
+docker network ls
+docker images
+docker-compose stop
+docker-compose ps
+docker-compose start
+docker-compose down -v
+```
 
 ---
 
@@ -819,7 +983,7 @@ Debe incluir:
 
 1. ✅ Screenshot del `docker-compose.yml` creado
 2. ✅ Screenshot del `db/init.sql` con tablas y datos
-3. ✅ Screenshot de `docker compose ps` (todos servicios up)
+3. ✅ Screenshot de `docker-compose ps` (todos servicios up)
 4. ✅ Screenshot de respuesta GET /api/cursos
 5. ✅ Screenshot de POST nuevo curso exitoso
 6. ✅ Screenshot de SELECT en MySQL (4 cursos)

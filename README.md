@@ -29,3 +29,7 @@
 - [Laboratorio 4.1: Instancias Computacionales, Acceso Seguro y Bases de Datos Gestionadas (EC2, RDS y Lightsail)](tema4/lab-4.1-aws-ec2-rds-y-lightsail.md).
 
 - [Laboratorio 4.2: Almacenamiento, Elasticidad y Escalado Automático (S3, ASG y ELB)](tema4/lab-4.2-aws-s3-asg-elb.md).
+
+## Tema 5: Automatización de Despliegues (CI/CD)
+
+- [Laboratorio 5.1: Creación de un flujo de GitHub Actions para CI](tema5/lab-5.1-creacion-de-un-workflow-de-github-actions-para-ci.md).
