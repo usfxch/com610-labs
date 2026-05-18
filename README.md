@@ -35,3 +35,9 @@
 - [Laboratorio 5.1: Creación de un flujo de GitHub Actions para CI](tema5/lab-5.1-creacion-de-un-workflow-de-github-actions-para-ci.md).
 
 - [Laboratorio 5.2: Configuración de un pipeline de despliegue continuo](tema5/lab-5.2-configuracion-de-un-pipeline-de-despliegue-continuo.md).
+
+## Tema 6: Servicios Gestionados y Arquitecturas Serverless
+
+- [Laboratorio 6.1: Despliegue de una Aplicación Web Estática con CI/CD](tema6/lab-6.1-despliegue-de-una-aplicacion-web-estatica-con-ci-cd.md).
+
+- Laboratorio 6.2: Despliegue y Uso de una Función Serverless
