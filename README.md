@@ -41,3 +41,10 @@
 - [Laboratorio 6.1: Despliegue de una Aplicación Web Estática con CI/CD](tema6/lab-6.1-despliegue-de-una-aplicacion-web-estatica-con-ci-cd.md).
 
 - Laboratorio 6.2: Despliegue y Uso de una Función Serverless
+
+
+### Exámenes
+
+- [1er Parcial - Enunciado](examenes/1er_parcial_enunciado.md)
+
+- [2do Parcial - Avance de Proyecto Final](examenes/2do_parcial_avance_proyecto_final.md)
