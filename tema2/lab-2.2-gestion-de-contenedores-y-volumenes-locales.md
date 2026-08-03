@@ -26,7 +26,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 - Un editor de texto o un IDE (como Visual Studio Code).
 
-- Acceso a la línea de comandos o terminal (instalar [Warp desde aquí](https://app.warp.dev/referral/3DY6RJ)). 
+- Acceso a la línea de comandos o terminal (instalar [Warp desde aquí](https://app.warp.dev/referral/NQ384D)). 
 
 - Conocimientos básicos del Laboratorio 2.1 sobre la ejecución de contenedores y la gestión de imágenes.
 

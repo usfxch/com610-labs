@@ -19,7 +19,7 @@ Al finalizar este laboratorio, el estudiante será capaz de:
 
 - Tener una cuenta activa de **Amazon Web Services (AWS)** con acceso a los servicios de Nivel Gratuito (Free Tier).
 
-- Tener instalado un cliente SSH en la máquina local (ej. [Warp](https://app.warp.dev/referral/3DY6RJ)).
+- Tener instalado un cliente SSH en la máquina local (ej. [Warp](https://app.warp.dev/referral/NQ384D)).
 
 - Tener instalado **Node.js** y un editor de código para poder trabajar con frameworks modernos como **NestJS**.
 
