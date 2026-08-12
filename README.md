@@ -26,7 +26,7 @@
 
 ## Tema 4: Gestión de Servicios de Cómputo, Almacenamiento y Bases de Datos en la Nube
 
-- [Laboratorio 4.1: Instancias Computacionales, Acceso Seguro y Bases de Datos Gestionadas (EC2, RDS y Lightsail)](tema4/lab-4.1-aws-ec2-rds-y-lightsail.md).
+- [Laboratorio 4.1: Instancias Computacionales, Acceso Seguro y Bases de Datos Gestionadas (EC2 y RDS)](tema4/lab-4.1-aws-ec2-rds.md).
 
 - [Laboratorio 4.2: Almacenamiento, Elasticidad y Escalado Automático (S3, ASG y ELB)](tema4/lab-4.2-aws-s3-asg-elb.md).
 
